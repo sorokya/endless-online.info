@@ -114,46 +114,79 @@ export default function App() {
 
   return (
     <>
-      <div className="navbar bg-base-100 shadow-sm">
-        <div className="navbar-start">
-          <div className="dropdown">
-            {/* biome-ignore lint/a11y/useSemanticElements: <explanation> */}
-            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+      <div className="min-h-screen flex flex-col">
+        <div className="navbar bg-base-100 shadow-sm">
+          <div className="navbar-start">
+            <div className="dropdown">
+              {/* biome-ignore lint/a11y/useSemanticElements: <explanation> */}
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost lg:hidden"
               >
-                <title>Mobile Menu</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h8m-8 6h16"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <title>Mobile Menu</title>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h8m-8 6h16"
+                  />
+                </svg>
+              </div>
+              <ul
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: <explanation>
+                tabIndex={0}
+                className="menu menu-sm dropdown-content z-1 mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
+              >
+                {menuItems}
+              </ul>
             </div>
-            <ul
-              // biome-ignore lint/a11y/noNoninteractiveTabindex: <explanation>
-              tabIndex={0}
-              className="menu menu-sm dropdown-content z-1 mt-3 w-52 rounded-box bg-base-100 p-2 shadow"
-            >
-              {menuItems}
-            </ul>
+            <Link className="btn btn-ghost text-xl" to="/">
+              <img src={Logo} alt="Logo" className="h-8" />
+              EOR Database
+            </Link>
           </div>
-          <Link className="btn btn-ghost text-xl" to="/">
-            <img src={Logo} alt="Logo" className="h-8" />
-            EOR Database
-          </Link>
+          <div className="navbar-center hidden lg:flex">
+            <ul className="menu menu-horizontal px-1">{menuItems}</ul>
+          </div>
+          <div className="navbar-end" />
         </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">{menuItems}</ul>
-        </div>
-        <div className="navbar-end" />
+        <Outlet />
+
+        <footer className="mt-auto bg-base-200 p-4 text-center">
+          <div className="text-sm">
+            <p>
+              &copy; 2025
+              <a href="https://leek.cafe" className="link">
+                Richard Leek
+              </a>
+              . All Rights Reserved.
+            </p>
+            <p>
+              Powered by
+              <a href="https://eor-api.exile-studios.com" className="link">
+                EOR API
+              </a>
+            </p>
+            <p>
+              <a href="https://endless-online.com" className="link">
+                Endless Online
+              </a>
+              &copy; Copyright 2025{' '}
+              <a href="https://www.vult-r.com" className="link">
+                Vult-r
+              </a>
+            </p>
+          </div>
+        </footer>
       </div>
-      <Outlet />
     </>
   );
 }
