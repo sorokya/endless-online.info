@@ -12,7 +12,7 @@ import {
 import Logo from '~/icon.svg';
 import type { Route } from './+types/root';
 import './app.css';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -34,6 +34,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const dismissMenu = useCallback(() => {
+    const element = document.activeElement;
+    if (element) {
+      // @ts-ignore
+      element.blur();
+    }
+  }, []);
+
   const menuItems = useMemo(() => {
     return (
       <>
@@ -41,7 +49,7 @@ export default function App() {
           <NavLink
             to="/"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             Home
           </NavLink>
@@ -50,7 +58,7 @@ export default function App() {
           <NavLink
             to="/items"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             Items
           </NavLink>
@@ -59,7 +67,7 @@ export default function App() {
           <NavLink
             to="/npcs"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             NPCs
           </NavLink>
@@ -68,7 +76,7 @@ export default function App() {
           <NavLink
             to="/classes"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             Classes
           </NavLink>
@@ -77,7 +85,7 @@ export default function App() {
           <NavLink
             to="/spells"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             Spells
           </NavLink>
@@ -86,7 +94,7 @@ export default function App() {
           <NavLink
             to="/quests"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             Quests
           </NavLink>
@@ -95,14 +103,15 @@ export default function App() {
           <NavLink
             to="/guides"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
-            onClick={(e) => e.currentTarget.blur()}
+            onClick={() => dismissMenu()}
           >
             Guides
           </NavLink>
         </li>
       </>
     );
-  }, []);
+  }, [dismissMenu]);
+
   return (
     <>
       <div className="navbar bg-base-100 shadow-sm">
