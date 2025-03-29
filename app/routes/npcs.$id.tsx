@@ -1,8 +1,8 @@
-import type { Route } from './+types/npcs.$id';
-import { data, Link } from 'react-router';
+import { Link, data } from 'react-router';
 import { getNpcById, getNpcDrops, getNpcSpawns } from '~/.server/npcs';
 import { getNpcSpeed } from '~/utils/get-npc-speed';
 import { getNpcType } from '~/utils/get-npc-type';
+import type { Route } from './+types/npcs.$id';
 
 export function meta({ data }: Route.MetaArgs) {
   const { npc } = data;

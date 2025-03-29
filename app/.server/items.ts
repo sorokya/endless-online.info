@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
-import { getNpcById, getNpcByName, getNpcByQuestBehaviorId } from './npcs';
-import { getShopByName } from './shops';
-import { getQuestByName } from './quests';
 import { getMaps } from './maps';
+import { getNpcById, getNpcByName, getNpcByQuestBehaviorId } from './npcs';
+import { getQuestByName } from './quests';
+import { getShopByName } from './shops';
 
 const DropSchema = z.object({
   npc_id: z.number(),

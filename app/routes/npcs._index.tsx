@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Route } from './+types/npcs._index';
 
-import { data, Form, Link } from 'react-router';
 import { useDebounce } from '@uidotdev/usehooks';
+import { Form, Link, data } from 'react-router';
 import { getNpcList } from '~/.server/npcs';
 
 export function links() {

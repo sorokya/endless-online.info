@@ -9,8 +9,8 @@ import {
   isRouteErrorResponse,
 } from 'react-router';
 
-import type { Route } from './+types/root';
 import Logo from '~/icon.svg';
+import type { Route } from './+types/root';
 import './app.css';
 import { useMemo } from 'react';
 

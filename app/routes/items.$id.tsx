@@ -1,3 +1,5 @@
+import { Link, data } from 'react-router';
+import { getClassById } from '~/.server/classes';
 import {
   getItemById,
   getItemCraftables,
@@ -6,11 +8,9 @@ import {
   getItemIngredientFor,
   getItemRewards,
 } from '~/.server/items';
-import type { Route } from './+types/items.$id';
-import { data, Link } from 'react-router';
-import { getItemType } from '~/utils/get-item-type';
 import { capitalize } from '~/utils/capitalize';
-import { getClassById } from '~/.server/classes';
+import { getItemType } from '~/utils/get-item-type';
+import type { Route } from './+types/items.$id';
 
 export function meta({ data }: Route.MetaArgs) {
   const { item } = data;
