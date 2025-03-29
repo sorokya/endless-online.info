@@ -201,7 +201,7 @@ export default function Npcs({ loaderData }: Route.ComponentProps) {
           </div>
           {pageCount > 1 && (
             <div className="mt-4 flex items-center justify-center">
-              <div className="join">{pageLinks}</div>
+              <div className="join flex-wrap">{pageLinks}</div>
             </div>
           )}
         </>
