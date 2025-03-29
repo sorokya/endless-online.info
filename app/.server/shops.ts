@@ -29,10 +29,19 @@ const ShopArraySchema = z.array(ShopSchema);
 
 type Shop = z.infer<typeof ShopSchema>;
 
-async function getShops(): Promise<Shop[]> {
-  const json = await fs.readFile('data/shops.json', 'utf8');
-  const object = JSON.parse(json);
-  return ShopArraySchema.parse(object);
+let SHOPS: Shop[] | null = null;
+export async function getShops(): Promise<Shop[]> {
+  if (!SHOPS) {
+    const json = await fs.readFile('data/shops.json', 'utf8');
+    const object = JSON.parse(json);
+    SHOPS = ShopArraySchema.parse(object);
+  }
+
+  return SHOPS;
+}
+
+export function reset() {
+  SHOPS = null;
 }
 
 export async function getShopList(): Promise<string[]> {
@@ -43,4 +52,13 @@ export async function getShopList(): Promise<string[]> {
 export async function getShopByName(name: string): Promise<Shop | undefined> {
   const shops = await getShops();
   return shops.find((i) => i.name === name);
+}
+
+export async function getShopByNpcName(
+  name: string,
+): Promise<Shop | undefined> {
+  const shops = await getShops();
+  return shops.find((i) =>
+    i.npcs.some((n) => n.npc_name.toLowerCase() === name.toLowerCase()),
+  );
 }

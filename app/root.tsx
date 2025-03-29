@@ -114,13 +114,13 @@ export default function App() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col">
+      <div className="flex min-h-screen flex-col">
         <div className="navbar bg-base-100 shadow-sm">
           <div className="navbar-start">
             <div className="dropdown">
-              {/* biome-ignore lint/a11y/useSemanticElements: <explanation> */}
               <div
                 tabIndex={0}
+                // biome-ignore lint/a11y/useSemanticElements: <explanation>
                 role="button"
                 className="btn btn-ghost lg:hidden"
               >

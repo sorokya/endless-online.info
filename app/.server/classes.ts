@@ -28,10 +28,19 @@ type ClassListEntry = {
   name: string;
 };
 
+let CLASSES: Class[] | null = null;
 async function getClasses(): Promise<Class[]> {
-  const json = await fs.readFile('data/classes.json', 'utf8');
-  const object = JSON.parse(json);
-  return ClassArraySchema.parse(object);
+  if (!CLASSES) {
+    const json = await fs.readFile('data/classes.json', 'utf8');
+    const object = JSON.parse(json);
+    CLASSES = ClassArraySchema.parse(object);
+  }
+
+  return CLASSES;
+}
+
+export function reset() {
+  CLASSES = null;
 }
 
 export async function getClassList(): Promise<ClassListEntry[]> {

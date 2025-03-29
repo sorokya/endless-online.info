@@ -44,10 +44,19 @@ type QuestListEntry = {
   name: string;
 };
 
+let QUESTS: Quest[] | null = null;
 async function getQuests(): Promise<Quest[]> {
-  const json = await fs.readFile('data/quests.json', 'utf8');
-  const object = JSON.parse(json);
-  return QuestArraySchema.parse(object);
+  if (!QUESTS) {
+    const json = await fs.readFile('data/quests.json', 'utf8');
+    const object = JSON.parse(json);
+    QUESTS = QuestArraySchema.parse(object);
+  }
+
+  return QUESTS;
+}
+
+export function reset() {
+  QUESTS = null;
 }
 
 export async function getQuestList(): Promise<QuestListEntry[]> {

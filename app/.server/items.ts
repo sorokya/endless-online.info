@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { CONFIG } from '~/config';
+import { MapTileSpec } from './map-tile-spec';
 import { getMaps } from './maps';
 import { getNpcById, getNpcByName, getNpcByQuestBehaviorId } from './npcs';
 import { getQuestByName } from './quests';
@@ -102,18 +104,35 @@ type ItemListEntry = {
   name: string;
 };
 
+let ITEMS: Item[] | null = null;
 export async function getItems(): Promise<Item[]> {
-  const json = await fs.readFile('data/items.json', 'utf8');
-  const object = JSON.parse(json);
-  return ItemArraySchema.parse(object).filter((i) => !i.name.endsWith('-res'));
+  if (!ITEMS) {
+    const json = await fs.readFile('data/items.json', 'utf8');
+    const object = JSON.parse(json);
+    ITEMS = ItemArraySchema.parse(object).filter(
+      (i) => !i.name.endsWith('-res'),
+    );
+  }
+
+  return ITEMS;
 }
+
+export function reset() {
+  ITEMS = null;
+}
+
+type ItemListResult = {
+  count: number;
+  records: ItemListEntry[];
+};
 
 export async function getItemList(search: {
   name: string;
   type: string;
-}): Promise<ItemListEntry[]> {
+  page: string;
+}): Promise<ItemListResult> {
   const items = await getItems();
-  return items
+  const filtered = items
     .filter((i) => {
       return (
         (!search.name ||
@@ -126,6 +145,19 @@ export async function getItemList(search: {
       id: i.id,
       name: i.name,
     }));
+
+  const page = Number.parseInt(search.page, 10);
+  if (Number.isNaN(page)) {
+    throw new Error(`Invalid page: ${search.page}`);
+  }
+
+  const start = CONFIG.PAGE_SIZE * (page - 1);
+  const end = start + CONFIG.PAGE_SIZE;
+
+  return {
+    count: filtered.length,
+    records: filtered.slice(start, end),
+  };
 }
 
 export async function getItemById(id: number): Promise<Item | undefined> {
@@ -357,4 +389,73 @@ export async function getItemGatherSpots(id: number): Promise<GatherSpot[]> {
     )
     .filter((m) => !!m)
     .filter((m) => m.item_id === id);
+}
+
+type ChestSpawn = {
+  item_id: number;
+  map_id: number;
+  map_name: string;
+  x: number;
+  y: number;
+  amount: number;
+  slot: number;
+  time: number;
+  graphic_id: number | undefined;
+};
+
+export async function getItemChestSpawns(id: number): Promise<ChestSpawn[]> {
+  const maps = await getMaps();
+
+  const getObjectGraphicAt = (mapId: number, x: number, y: number) => {
+    const map = maps.find((m) => m.id === mapId);
+    if (!map) {
+      return undefined;
+    }
+
+    const objectLayer = map.map_layers.find((l) => l.details.name === 'Object');
+    if (!objectLayer?.tiles) {
+      return undefined;
+    }
+
+    const tile = objectLayer.tiles.find((t) => t.x === x && t.y === y);
+    if (!tile) {
+      return undefined;
+    }
+
+    return tile.tile;
+  };
+
+  const mapHasChestSpecAt = (mapId: number, x: number, y: number) => {
+    const map = maps.find((m) => m.id === mapId);
+    if (!map) {
+      return undefined;
+    }
+
+    const tile = map.spec_tiles.find((t) => t.x === x && t.y === y);
+    if (!tile) {
+      return undefined;
+    }
+
+    return tile.spec === MapTileSpec.Chest;
+  };
+
+  return maps
+    .filter((m) => {
+      return m.items.some((i) => i.item_id === id);
+    })
+    .flatMap((m) =>
+      m.items.map((i) => ({
+        item_id: i.item_id,
+        map_id: m.id,
+        map_name: m.name,
+        x: i.x,
+        y: i.y,
+        amount: i.amount,
+        slot: i.slot,
+        time: i.time,
+        key: i.key,
+        graphic_id: getObjectGraphicAt(m.id, i.x, i.y),
+      })),
+    )
+    .filter((m) => m.item_id === id && mapHasChestSpecAt(m.map_id, m.x, m.y));
 }

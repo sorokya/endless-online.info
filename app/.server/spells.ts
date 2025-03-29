@@ -32,10 +32,19 @@ type SpellListEntry = {
   name: string;
 };
 
+let SPELLS: Spell[] | null = null;
 async function getSpells(): Promise<Spell[]> {
-  const json = await fs.readFile('data/spells.json', 'utf8');
-  const object = JSON.parse(json);
-  return SpellArraySchema.parse(object);
+  if (!SPELLS) {
+    const json = await fs.readFile('data/spells.json', 'utf8');
+    const object = JSON.parse(json);
+    SPELLS = SpellArraySchema.parse(object);
+  }
+
+  return SPELLS;
+}
+
+export function reset() {
+  SPELLS = null;
 }
 
 export async function getSpellList(): Promise<SpellListEntry[]> {

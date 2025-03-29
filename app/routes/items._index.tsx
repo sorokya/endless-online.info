@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Route } from './+types/items._index';
 
 import { useDebounce } from '@uidotdev/usehooks';
 import { Form, Link, data } from 'react-router';
 import { getItemList } from '~/.server/items';
+import { CONFIG } from '~/config';
 
 export function links() {
   return [{ rel: 'canonical', href: 'https://endless-online.info/items' }];
@@ -30,6 +31,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const search = {
     name: url.searchParams.get('name') || '',
     type: url.searchParams.get('type') || 'all',
+    page: url.searchParams.get('page') || '1',
   };
 
   const items = await getItemList(search);
@@ -45,6 +47,11 @@ export default function Items({ loaderData }: Route.ComponentProps) {
   const [name, setName] = useState(search.name);
   const [type, setType] = useState(search.type);
 
+  const pageCount = useMemo(
+    () => Math.ceil(items.count / CONFIG.PAGE_SIZE),
+    [items],
+  );
+
   const debouncedName = useDebounce(name, 300);
 
   // Use useRef for the form element
@@ -56,6 +63,46 @@ export default function Items({ loaderData }: Route.ComponentProps) {
       formRef.current.requestSubmit();
     }
   }, [debouncedName]);
+
+  const getSearchParams = useCallback(
+    (page: number) => {
+      const params = new URLSearchParams();
+      params.append('name', name);
+      params.append('type', type);
+      params.append('page', page.toString());
+
+      return Array.from(params.entries())
+        .map(([key, value]) =>
+          value ? `${key}=${encodeURIComponent(value)}` : key,
+        )
+        .join('&');
+    },
+    [name, type],
+  );
+
+  const pageLinks = useMemo(() => {
+    if (pageCount === 1) {
+      return undefined;
+    }
+
+    const links = [];
+    for (let i = 1; i <= pageCount; i++) {
+      const active = search.page === i.toString();
+      links.push(
+        <Link
+          key={i}
+          to={{
+            search: getSearchParams(i),
+          }}
+          className={`join-item btn ${active ? 'btn-primary' : ''}`}
+        >
+          {i}
+        </Link>,
+      );
+    }
+
+    return links;
+  }, [pageCount, getSearchParams, search.page]);
 
   return (
     <div className="container mx-auto p-4">
@@ -141,13 +188,15 @@ export default function Items({ loaderData }: Route.ComponentProps) {
           </select>
         </div>
 
+        <input name="page" type="hidden" value={search.page} />
+
         <div className="mt-6">
           <button type="submit" className="btn btn-primary">
             Search
           </button>
         </div>
       </Form>
-      {items.length === 0 ? (
+      {items.records.length === 0 ? (
         <div className="flex h-60 items-center justify-center">
           <div className="card bg-base-200 text-center shadow-xl">
             <div className="card-body">
@@ -161,22 +210,29 @@ export default function Items({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {items.slice(0, 50).map((item) => (
-            <Link
-              to={`/items/${item.id}`}
-              key={item.id}
-              className="card bg-base-200 p-4 shadow-xl"
-            >
-              <img
-                src={`https://eor-api.exile-studios.com/api/items/${item.id}/graphic/ground`}
-                alt={item.name}
-                className="h-16 w-full object-contain"
-              />
-              <div className="mt-2 text-center font-bold">{item.name}</div>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {items.records.map((item) => (
+              <Link
+                to={`/items/${item.id}`}
+                key={item.id}
+                className="card bg-base-200 p-4 shadow-xl"
+              >
+                <img
+                  src={`https://eor-api.exile-studios.com/api/items/${item.id}/graphic/ground`}
+                  alt={item.name}
+                  className="transform-[scale(2)] m-auto"
+                />
+                <div className="mt-2 text-center font-bold">{item.name}</div>
+              </Link>
+            ))}
+          </div>
+          {pageCount > 1 && (
+            <div className="mt-4 flex items-center justify-center">
+              <div className="join">{pageLinks}</div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

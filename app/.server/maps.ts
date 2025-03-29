@@ -42,6 +42,29 @@ const WarpTile = z.object({
   destination_y: z.number(),
 });
 
+const MapLayerDetails = z.object({
+  name: z.string(),
+  rows: z.number(),
+  columns: z.number().optional(),
+});
+
+const MapLayerTile = z.object({
+  x: z.number(),
+  y: z.number(),
+  tile: z.number().optional(),
+});
+
+const MapLayer = z.object({
+  details: MapLayerDetails,
+  tiles: z.array(MapLayerTile).optional(),
+});
+
+const SpecTile = z.object({
+  x: z.number(),
+  y: z.number(),
+  spec: z.number(),
+});
+
 const MapSchema = z.object({
   id: z.number(),
   rid1: z.number(),
@@ -58,6 +81,8 @@ const MapSchema = z.object({
   items: z.array(Item),
   map_gathers: z.array(Gather).optional(),
   warp_tiles: z.array(WarpTile),
+  map_layers: z.array(MapLayer),
+  spec_tiles: z.array(SpecTile),
 });
 
 const MapArraySchema = z.array(MapSchema);
@@ -69,10 +94,19 @@ type MapListEntry = {
   name: string;
 };
 
+let MAPS: Map[] | null = null;
 export async function getMaps(): Promise<Map[]> {
   const json = await fs.readFile('data/maps.json', 'utf8');
-  const object = JSON.parse(json);
-  return MapArraySchema.parse(object);
+  if (!MAPS) {
+    const object = JSON.parse(json);
+    MAPS = MapArraySchema.parse(object);
+  }
+
+  return MAPS;
+}
+
+export function reset() {
+  MAPS = null;
 }
 
 export async function getMapList(): Promise<MapListEntry[]> {

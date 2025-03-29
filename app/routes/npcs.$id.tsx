@@ -1,5 +1,11 @@
 import { Link, data } from 'react-router';
-import { getNpcById, getNpcDrops, getNpcSpawns } from '~/.server/npcs';
+import {
+  getNpcBuyItems,
+  getNpcById,
+  getNpcCrafts,
+  getNpcDrops,
+  getNpcSpawns,
+} from '~/.server/npcs';
 import { getNpcSpeed } from '~/utils/get-npc-speed';
 import { getNpcType } from '~/utils/get-npc-type';
 import type { Route } from './+types/npcs.$id';
@@ -34,16 +40,20 @@ export async function loader({ params }: Route.LoaderArgs) {
   const npc = await getNpcById(id);
   const drops = await getNpcDrops(id);
   const spawns = await getNpcSpawns(id);
+  const buyItems = await getNpcBuyItems(id);
+  const crafts = await getNpcCrafts(id);
 
   return data({
     npc,
     drops,
     spawns,
+    buyItems,
+    crafts,
   });
 }
 
 export default function Npc({ loaderData }: Route.ComponentProps) {
-  const { npc, drops, spawns } = loaderData;
+  const { npc, drops, spawns, buyItems, crafts } = loaderData;
 
   if (!npc) {
     return (
@@ -126,15 +136,189 @@ export default function Npc({ loaderData }: Route.ComponentProps) {
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <img
-                      src={`https://eor-api.exile-studios.com/api/items/${drop.id}/graphic/ground`}
+                      src={`https://eor-api.exile-studios.com/api/items/${drop.id}/graphic`}
                       alt={drop.name}
-                      className="h-16 w-full object-contain"
+                      className="h-8 w-full object-contain"
                     />
                     <div className="mt-2 text-center font-bold">
                       {drop.name}
                     </div>
                     <div className="mt-2 text-center">{drop.percent}%</div>
                   </Link>
+                ))}
+              </div>
+            </details>
+          )}
+
+          {buyItems.length > 0 && (
+            <details
+              className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
+              open
+            >
+              <summary className="collapse-title font-bold text-xl">
+                Items for Sale:
+              </summary>
+
+              <div className="mt-1 grid grid-cols-2 gap-4 md:grid-cols-4">
+                {buyItems.map((item) => (
+                  <Link
+                    to={`/items/${item.item_id}`}
+                    key={item.item_id}
+                    className="card bg-base-200 p-4 shadow-xl"
+                  >
+                    <img
+                      src={`https://eor-api.exile-studios.com/api/items/${item.item_id}/graphic`}
+                      alt={item.item_name}
+                      className="h-8 w-full object-contain"
+                    />
+                    <div className="mt-2 text-center font-bold">
+                      {item.item_name}
+                    </div>
+                    <div className="mt-2 text-center">{item.price}</div>
+                  </Link>
+                ))}
+              </div>
+            </details>
+          )}
+
+          {crafts.length > 0 && (
+            <details
+              className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
+              open
+            >
+              <summary className="collapse-title font-bold text-xl">
+                Craftable Items:
+              </summary>
+
+              <table className="hidden lg:table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Cost</th>
+                    <th>Ingredients</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {crafts.map((c) => (
+                    <tr key={c.item_name}>
+                      <td className="flex gap-1">
+                        <Link
+                          to={`/items/${c.item_id}`}
+                          key={c.item_name}
+                          className="card bg-base-200 p-4 shadow-xl"
+                        >
+                          <img
+                            src={`https://eor-api.exile-studios.com/api/items/${c.item_id}/graphic/ground`}
+                            alt={c.item_name}
+                            className="transform-[scale(2)] m-auto"
+                          />
+                          <div className="mt-2 text-center font-bold">
+                            {c.item_name}
+                          </div>
+                        </Link>
+                      </td>
+                      <td>
+                        <Link
+                          to="/items/1"
+                          className="card bg-base-200 p-4 shadow-xl"
+                        >
+                          <img
+                            src="https://eor-api.exile-studios.com/api/items/1/graphic"
+                            alt="Eons"
+                            className="h-8 w-full object-contain"
+                          />
+                          <div className="mt-2 text-center font-bold">Eons</div>
+                          <div className="mt-2 text-center">{c.eons}</div>
+                        </Link>
+                      </td>
+                      <td className="flex gap-1">
+                        {c.ingredients.map((i) => (
+                          <Link
+                            to={`/items/${i.item_id}`}
+                            key={i.item_id}
+                            className="card bg-base-200 p-4 shadow-xl"
+                          >
+                            <img
+                              src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
+                              alt={i.item_name}
+                              className="transform-[scale(2)] m-auto"
+                            />
+                            <div className="mt-2 text-center font-bold">
+                              {i.item_name}
+                            </div>
+                            <div className="mt-2 text-center">{i.quantity}</div>
+                          </Link>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="space-y-4 lg:hidden">
+                {crafts.map((c) => (
+                  <div
+                    key={c.item_id}
+                    className="card bg-base-200 p-4 shadow-xl"
+                  >
+                    <h2 className="text-center font-bold text-lg">
+                      <Link
+                        to={`/items/${c.item_id}`}
+                        className="card w-24 bg-base-100 p-3 text-center shadow-md"
+                      >
+                        <img
+                          src={`https://eor-api.exile-studios.com/api/items/${c.item_id}/graphic`}
+                          alt={c.item_name}
+                          className="transform-[scale(2)] m-auto"
+                        />
+                        <div className="mt-1 font-bold text-sm">
+                          {c.item_name}
+                        </div>
+                      </Link>
+                    </h2>
+
+                    <details
+                      className="collapse-arrow collapse mt-2 bg-base-300"
+                      open
+                    >
+                      <summary className="collapse-title font-semibold">
+                        Ingredients
+                      </summary>
+                      <div className="collapse-content flex flex-wrap justify-center gap-2">
+                        {c.eons > 0 && (
+                          <Link
+                            to="/items/1"
+                            className="card bg-base-100 p-3 text-center shadow-md"
+                          >
+                            <img
+                              src="https://eor-api.exile-studios.com/api/items/1/graphic"
+                              alt="Eons"
+                              className="h-8 w-full object-contain"
+                            />
+                            <div className="mt-1 font-bold">Eons</div>
+                            <div>{c.eons}</div>
+                          </Link>
+                        )}
+                        {c.ingredients.map((i) => (
+                          <Link
+                            to={`/items/${i.item_id}`}
+                            key={i.item_id}
+                            className="card w-24 bg-base-100 p-3 text-center shadow-md"
+                          >
+                            <img
+                              src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
+                              alt={i.item_name}
+                              className="transform-[scale(2)] m-auto"
+                            />
+                            <div className="mt-1 font-bold text-sm">
+                              {i.item_name}
+                            </div>
+                            <div className="text-xs">x{i.quantity}</div>
+                          </Link>
+                        ))}
+                      </div>
+                    </details>
+                  </div>
                 ))}
               </div>
             </details>

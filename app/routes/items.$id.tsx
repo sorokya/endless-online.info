@@ -2,6 +2,7 @@ import { Link, data } from 'react-router';
 import { getClassById } from '~/.server/classes';
 import {
   getItemById,
+  getItemChestSpawns,
   getItemCraftables,
   getItemDrops,
   getItemGatherSpots,
@@ -11,7 +12,6 @@ import {
 import { capitalize } from '~/utils/capitalize';
 import { getItemType } from '~/utils/get-item-type';
 import type { Route } from './+types/items.$id';
-import React from 'react';
 
 export function meta({ data }: Route.MetaArgs) {
   const { item } = data;
@@ -49,6 +49,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     : null;
   const rewards = await getItemRewards(id);
   const gatherSpots = await getItemGatherSpots(id);
+  const chestSpawns = await getItemChestSpawns(id);
 
   return data({
     item,
@@ -58,6 +59,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     requiredClassName: requiredClass?.name || 'None',
     rewards,
     gatherSpots,
+    chestSpawns,
   });
 }
 
@@ -70,6 +72,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
     requiredClassName,
     rewards,
     gatherSpots,
+    chestSpawns,
   } = loaderData;
 
   if (!item) {
@@ -189,7 +192,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 Crafted at:
               </summary>
 
-              <table className="table-zebra hidden lg:table">
+              <table className="hidden lg:table">
                 <thead>
                   <tr>
                     <th>Shop</th>
@@ -247,7 +250,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                             <img
                               src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
                               alt={i.item_name}
-                              className="h-16 w-full object-contain"
+                              className="transform-[scale(2)] m-auto"
                             />
                             <div className="mt-2 text-center font-bold">
                               {i.item_name}
@@ -334,7 +337,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                             <img
                               src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
                               alt={i.item_name}
-                              className="h-16 w-full object-contain"
+                              className="transform-[scale(2)] m-auto"
                             />
                             <div className="mt-1 font-bold text-sm">
                               {i.item_name}
@@ -369,7 +372,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                     <img
                       src={`https://eor-api.exile-studios.com/api/items/${item.id}/graphic/ground`}
                       alt={item.name}
-                      className="h-16 w-full object-contain"
+                      className="transform-[scale(2)] m-auto"
                     />
                     <div className="mt-2 text-center font-bold">
                       {item.name}
@@ -439,6 +442,44 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       {spot.x}, {spot.y}
                     </div>
                     <div className="mt-2 text-center">{spot.amount}</div>
+                  </Link>
+                ))}
+              </div>
+            </details>
+          )}
+
+          {chestSpawns.length > 0 && (
+            <details
+              className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
+              open
+            >
+              <summary className="collapse-title font-bold text-xl">
+                Spawns at:
+              </summary>
+
+              <div className="mt-1 grid grid-cols-2 gap-4 md:grid-cols-4">
+                {chestSpawns.map((spawn) => (
+                  <Link
+                    to={`/maps/${spawn.map_id}`}
+                    key={spawn.map_id}
+                    className="card bg-base-200 p-4 shadow-xl"
+                  >
+                    {spawn.graphic_id && (
+                      <img
+                        src={`https://eor-api.exile-studios.com/api/graphics/6/${spawn.graphic_id + 100}`}
+                        alt={item.name}
+                        className="h-8 w-full object-contain"
+                      />
+                    )}
+                    <div className="mt-2 text-center font-bold">
+                      {spawn.map_name}
+                    </div>
+                    <div className="mt-2 text-center">
+                      Coords: {spawn.x}, {spawn.y}
+                    </div>
+                    <div className="mt-2 text-center">
+                      Amount: {spawn.amount}
+                    </div>
                   </Link>
                 ))}
               </div>

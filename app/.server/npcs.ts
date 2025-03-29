@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { CONFIG } from '~/config';
 import { getItemById } from './items';
 import { getMaps } from './maps';
+import { getShopByNpcName } from './shops';
 
 const DropSchema = z.object({
   itemID: z.number(),
@@ -64,18 +66,33 @@ type NpcListEntry = {
   name: string;
 };
 
+let NPCS: Npc[] | null = null;
 export async function getNpcs(): Promise<Npc[]> {
-  const json = await fs.readFile('data/npcs.json', 'utf8');
-  const object = JSON.parse(json);
-  return NpcArraySchema.parse(object);
+  if (!NPCS) {
+    const json = await fs.readFile('data/npcs.json', 'utf8');
+    const object = JSON.parse(json);
+    NPCS = NpcArraySchema.parse(object);
+  }
+
+  return NPCS;
 }
+
+export function reset() {
+  NPCS = null;
+}
+
+type NpcListResult = {
+  count: number;
+  records: NpcListEntry[];
+};
 
 export async function getNpcList(search: {
   name: string;
   type: string;
-}): Promise<NpcListEntry[]> {
+  page: string;
+}): Promise<NpcListResult> {
   const npcs = await getNpcs();
-  return npcs
+  const filtered = npcs
     .filter((i) => {
       return (
         (!search.name ||
@@ -88,6 +105,19 @@ export async function getNpcList(search: {
       id: i.id,
       name: i.name,
     }));
+
+  const page = Number.parseInt(search.page, 10);
+  if (Number.isNaN(page)) {
+    throw new Error(`Invalid page: ${search.page}`);
+  }
+
+  const start = CONFIG.PAGE_SIZE * (page - 1);
+  const end = start + CONFIG.PAGE_SIZE;
+
+  return {
+    count: filtered.length,
+    records: filtered.slice(start, end),
+  };
 }
 
 export async function getNpcById(id: number): Promise<Npc | undefined> {
@@ -189,4 +219,104 @@ export async function getNpcSpawns(id: number): Promise<NpcSpawn[]> {
     )
     .filter((m) => !!m)
     .filter((m) => m.npc_id === id);
+}
+
+type NpcSellItem = {
+  item_id: number;
+  item_name: string;
+  price: number;
+};
+
+export async function getNpcBuyItems(id: number): Promise<NpcSellItem[]> {
+  const npc = await getNpcById(id);
+  if (!npc) {
+    return [];
+  }
+
+  const shop = await getShopByNpcName(npc.name);
+  if (!shop) {
+    return [];
+  }
+
+  const buys = await Promise.all(
+    shop.buys.map(async (b) => {
+      const item = await getItemById(b.item_id);
+      if (!item) {
+        return undefined;
+      }
+
+      return {
+        item_id: item.id,
+        item_name: item.name,
+        price: b.price,
+      };
+    }),
+  );
+
+  return buys.filter((b) => !!b);
+}
+
+type CraftableIngredient = {
+  item_id: number;
+  item_name: string;
+  quantity: number;
+};
+
+type NpcCraft = {
+  item_id: number;
+  item_name: string;
+  eons: number;
+  gold: number;
+  ingredients: CraftableIngredient[];
+};
+
+export async function getNpcCrafts(id: number): Promise<NpcCraft[]> {
+  const npc = await getNpcById(id);
+  if (!npc) {
+    return [];
+  }
+
+  const shop = await getShopByNpcName(npc.name);
+  if (!shop) {
+    return [];
+  }
+
+  const crafts = await Promise.all(
+    shop.crafts.map(async (c) => {
+      const item = await getItemById(c.item_id);
+      if (!item) {
+        return undefined;
+      }
+
+      const craftable = item.craftables?.find((i) => i.shopName === shop.name);
+      if (!craftable) {
+        return undefined;
+      }
+
+      const ingredients = await Promise.all(
+        craftable.craftIngredients.map(async (i) => {
+          const item = await getItemById(i.itemID);
+          if (!item) {
+            return undefined;
+          }
+
+          return {
+            item_id: item.id,
+            item_name: item.name,
+            quantity: i.quantity,
+          };
+        }),
+      );
+
+      return {
+        item_id: item.id,
+        item_name: item.name,
+        eons: craftable.craftEon,
+        gold: craftable.craftGold,
+        ingredients: ingredients.filter((i) => !!i),
+      };
+    }),
+  );
+
+  return crafts.filter((c) => !!c);
 }
