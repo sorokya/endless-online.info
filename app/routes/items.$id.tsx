@@ -11,6 +11,7 @@ import {
 import { capitalize } from '~/utils/capitalize';
 import { getItemType } from '~/utils/get-item-type';
 import type { Route } from './+types/items.$id';
+import React from 'react';
 
 export function meta({ data }: Route.MetaArgs) {
   const { item } = data;
@@ -188,7 +189,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 Crafted at:
               </summary>
 
-              <table className="table-zebra table sm:hidden md:block">
+              <table className="table-zebra hidden lg:table">
                 <thead>
                   <tr>
                     <th>Shop</th>
@@ -260,7 +261,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 </tbody>
               </table>
 
-              <div className="space-y-4 md:hidden">
+              <div className="space-y-4 lg:hidden">
                 {craftables.map((c) => (
                   <div
                     key={c.shopName}
