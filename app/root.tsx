@@ -41,6 +41,7 @@ export default function App() {
           <NavLink
             to="/"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             Home
           </NavLink>
@@ -49,6 +50,7 @@ export default function App() {
           <NavLink
             to="/items"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             Items
           </NavLink>
@@ -57,6 +59,7 @@ export default function App() {
           <NavLink
             to="/npcs"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             NPCs
           </NavLink>
@@ -65,6 +68,7 @@ export default function App() {
           <NavLink
             to="/classes"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             Classes
           </NavLink>
@@ -73,6 +77,7 @@ export default function App() {
           <NavLink
             to="/spells"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             Spells
           </NavLink>
@@ -81,6 +86,7 @@ export default function App() {
           <NavLink
             to="/quests"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             Quests
           </NavLink>
@@ -89,6 +95,7 @@ export default function App() {
           <NavLink
             to="/guides"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={(e) => e.currentTarget.blur()}
           >
             Guides
           </NavLink>

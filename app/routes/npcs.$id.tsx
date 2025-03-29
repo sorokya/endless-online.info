@@ -85,40 +85,28 @@ export default function Npc({ loaderData }: Route.ComponentProps) {
               Stats:
             </summary>
 
-            <table className="table-zebra table">
-              <tbody>
-                <tr>
-                  <td>HP</td>
-                  <td>{npc.hp}</td>
-                  <td>MP</td>
-                  <td>{npc.tp}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Accuracy</strong>
-                  </td>
-                  <td>{npc.accuracy}</td>
-                  <td>
-                    <strong>Evade</strong>
-                  </td>
-                  <td>{npc.evasion}</td>
-                  <td>
-                    <strong>Armor</strong>
-                  </td>
-                  <td>{npc.armor}</td>
-                </tr>
-                <tr>
-                  <td>Damage</td>
-                  <td>
-                    {npc.min_damage} - {npc.max_damage}
-                  </td>
-                  <td>Level</td>
-                  <td>{npc.level}</td>
-                  <td>Experience</td>
-                  <td>{npc.experience}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
+              <div className="font-bold">HP</div>
+              <div>{npc.hp}</div>
+              <div className="font-bold">MP</div>
+              <div>{npc.tp}</div>
+              <div className="font-bold">Level</div>
+              <div>{npc.level}</div>
+
+              <div className="font-bold">Accuracy</div>
+              <div>{npc.accuracy}</div>
+              <div className="font-bold">Evade</div>
+              <div>{npc.evasion}</div>
+              <div className="font-bold">Armor</div>
+              <div>{npc.armor}</div>
+
+              <div className="font-bold">Damage</div>
+              <div>
+                {npc.min_damage} - {npc.max_damage}
+              </div>
+              <div className="font-bold">Experience</div>
+              <div>{npc.experience}</div>
+            </div>
           </details>
 
           {drops.length > 0 && (

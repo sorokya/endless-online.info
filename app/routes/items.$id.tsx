@@ -108,68 +108,44 @@ export default function Item({ loaderData }: Route.ComponentProps) {
               Stats:
             </summary>
 
-            <table className="table-zebra table">
-              <tbody>
-                <tr>
-                  <td>HP</td>
-                  <td>{item.hp}</td>
-                  <td>MP</td>
-                  <td>{item.tp}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Power</strong>
-                  </td>
-                  <td>{item.power}</td>
-                  <td>
-                    <strong>Accuracy</strong>
-                  </td>
-                  <td>{item.accuracy}</td>
-                  <td>
-                    <strong>Dexterity</strong>
-                  </td>
-                  <td>{item.dexterity}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Defense</strong>
-                  </td>
-                  <td>{item.defense}</td>
-                  <td>
-                    <strong>Vitality</strong>
-                  </td>
-                  <td>{item.vitality}</td>
-                  <td>
-                    <strong>Aura</strong>
-                  </td>
-                  <td>{item.aura}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Hit Rate</strong>
-                  </td>
-                  <td>{item.hit_rate}</td>
-                  <td>
-                    <strong>Evade</strong>
-                  </td>
-                  <td>{item.evasion}</td>
-                  <td>
-                    <strong>Armor</strong>
-                  </td>
-                  <td>{item.armor}</td>
-                </tr>
-                <tr>
-                  <td>Damage</td>
-                  <td>
-                    {item.min_damage} - {item.max_damage}
-                  </td>
-                  <td>Range</td>
-                  <td>{item.range}</td>
-                  <td>Crititcal Chance</td>
-                  <td>{item.critical_chance}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
+              <div className="font-bold">HP</div>
+              <div>{item.hp}</div>
+              <div className="font-bold">MP</div>
+              <div>{item.tp}</div>
+              <div className="hidden md:block" />
+              <div className="hidden md:block" />
+
+              <div className="font-bold">Power</div>
+              <div>{item.power}</div>
+              <div className="font-bold">Accuracy</div>
+              <div>{item.accuracy}</div>
+              <div className="font-bold">Dexterity</div>
+              <div>{item.dexterity}</div>
+
+              <div className="font-bold">Defense</div>
+              <div>{item.defense}</div>
+              <div className="font-bold">Vitality</div>
+              <div>{item.vitality}</div>
+              <div className="font-bold">Aura</div>
+              <div>{item.aura}</div>
+
+              <div className="font-bold">Hit Rate</div>
+              <div>{item.hit_rate}</div>
+              <div className="font-bold">Evade</div>
+              <div>{item.evasion}</div>
+              <div className="font-bold">Armor</div>
+              <div>{item.armor}</div>
+
+              <div className="font-bold">Damage</div>
+              <div>
+                {item.min_damage} - {item.max_damage}
+              </div>
+              <div className="font-bold">Range</div>
+              <div>{item.range}</div>
+              <div className="font-bold">Critical Chance</div>
+              <div>{item.critical_chance}</div>
+            </div>
           </details>
 
           {drops.length > 0 && (
@@ -212,7 +188,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 Crafted at:
               </summary>
 
-              <table className="table-zebra table">
+              <table className="table-zebra table sm:hidden md:block">
                 <thead>
                   <tr>
                     <th>Shop</th>
@@ -283,6 +259,93 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                   ))}
                 </tbody>
               </table>
+
+              <div className="space-y-4 md:hidden">
+                {craftables.map((c) => (
+                  <div
+                    key={c.shopName}
+                    className="card bg-base-200 p-4 shadow-xl"
+                  >
+                    <h2 className="text-center font-bold text-lg">
+                      {c.shopName}
+                    </h2>
+
+                    <details
+                      className="collapse-arrow collapse mt-2 bg-base-300"
+                      open
+                    >
+                      <summary className="collapse-title font-semibold">
+                        Available At
+                      </summary>
+                      <div className="collapse-content flex flex-wrap justify-center gap-2">
+                        {c.npcs.map((n) => (
+                          <Link
+                            to={`/npcs/${n.id}`}
+                            key={n.name}
+                            className="card w-24 bg-base-100 p-3 text-center shadow-md"
+                          >
+                            <img
+                              src={`https://eor-api.exile-studios.com/api/npcs/${n.id}/graphic`}
+                              alt={n.name}
+                              className="h-16 w-full object-contain"
+                            />
+                            <div className="mt-1 font-bold text-sm">
+                              {n.name}
+                            </div>
+                            <div className="text-xs">
+                              <Link to={`/maps/${n.map_id}`}>
+                                {capitalize(n.map_name)}
+                              </Link>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </details>
+
+                    <details
+                      className="collapse-arrow collapse mt-2 bg-base-300"
+                      open
+                    >
+                      <summary className="collapse-title font-semibold">
+                        Ingredients
+                      </summary>
+                      <div className="collapse-content flex flex-wrap justify-center gap-2">
+                        {c.eons > 0 && (
+                          <Link
+                            to="/items/1"
+                            className="card bg-base-100 p-3 text-center shadow-md"
+                          >
+                            <img
+                              src="https://eor-api.exile-studios.com/api/items/1/graphic"
+                              alt="Eons"
+                              className="h-8 w-full object-contain"
+                            />
+                            <div className="mt-1 font-bold">Eons</div>
+                            <div>{c.eons}</div>
+                          </Link>
+                        )}
+                        {c.ingredients.map((i) => (
+                          <Link
+                            to={`/items/${i.item_id}`}
+                            key={i.item_id}
+                            className="card w-24 bg-base-100 p-3 text-center shadow-md"
+                          >
+                            <img
+                              src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
+                              alt={i.item_name}
+                              className="h-16 w-full object-contain"
+                            />
+                            <div className="mt-1 font-bold text-sm">
+                              {i.item_name}
+                            </div>
+                            <div className="text-xs">x{i.quantity}</div>
+                          </Link>
+                        ))}
+                      </div>
+                    </details>
+                  </div>
+                ))}
+              </div>
             </details>
           )}
 
@@ -386,44 +449,28 @@ export default function Item({ loaderData }: Route.ComponentProps) {
               Requirements:
             </summary>
 
-            <table className="table-zebra table">
-              <tbody>
-                <tr>
-                  <td>Level</td>
-                  <td>{item.required_level}</td>
-                  <td>Class</td>
-                  <td>{requiredClassName}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Power</strong>
-                  </td>
-                  <td>{item.required_power}</td>
-                  <td>
-                    <strong>Accuracy</strong>
-                  </td>
-                  <td>{item.required_accuracy}</td>
-                  <td>
-                    <strong>Dexterity</strong>
-                  </td>
-                  <td>{item.required_dexterity}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <strong>Defense</strong>
-                  </td>
-                  <td>{item.required_defense}</td>
-                  <td>
-                    <strong>Vitality</strong>
-                  </td>
-                  <td>{item.required_vitality}</td>
-                  <td>
-                    <strong>Aura</strong>
-                  </td>
-                  <td>{item.required_aura}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
+              <div className="font-bold">Level</div>
+              <div>{item.required_level}</div>
+              <div className="font-bold">Class</div>
+              <div>{requiredClassName}</div>
+              <div className="hidden md:block" />
+              <div className="hidden md:block" />
+
+              <div className="font-bold">Power</div>
+              <div>{item.required_power}</div>
+              <div className="font-bold">Accuracy</div>
+              <div>{item.required_accuracy}</div>
+              <div className="font-bold">Dexterity</div>
+              <div>{item.required_dexterity}</div>
+
+              <div className="font-bold">Defense</div>
+              <div>{item.required_defense}</div>
+              <div className="font-bold">Vitality</div>
+              <div>{item.required_vitality}</div>
+              <div className="font-bold">Aura</div>
+              <div>{item.required_aura}</div>
+            </div>
           </details>
         </div>
       </div>
