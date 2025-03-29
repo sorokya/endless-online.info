@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { CONFIG } from '~/config';
 
 const ClassSchema = z.object({
   id: z.number(),
@@ -43,12 +44,41 @@ export function reset() {
   CLASSES = null;
 }
 
-export async function getClassList(): Promise<ClassListEntry[]> {
+type ClassListResult = {
+  count: number;
+  records: ClassListEntry[];
+};
+
+export async function getClassList(search: {
+  name: string;
+  page: string;
+}): Promise<ClassListResult> {
   const classes = await getClasses();
-  return classes.map((i) => ({
-    id: i.id,
-    name: i.name,
-  }));
+
+  const filtered = classes
+    .filter((i) => {
+      return (
+        !search.name ||
+        i.name.toLowerCase().indexOf(search.name.toLowerCase()) > -1
+      );
+    })
+    .map((i) => ({
+      id: i.id,
+      name: i.name,
+    }));
+
+  const page = Number.parseInt(search.page, 10);
+  if (Number.isNaN(page)) {
+    throw new Error(`Invalid page: ${search.page}`);
+  }
+
+  const start = CONFIG.PAGE_SIZE * (page - 1);
+  const end = start + CONFIG.PAGE_SIZE;
+
+  return {
+    count: filtered.length,
+    records: filtered.slice(start, end),
+  };
 }
 
 export async function getClassById(id: number): Promise<Class | undefined> {
