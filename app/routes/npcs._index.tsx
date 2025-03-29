@@ -1,26 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Route } from './+types/items._index';
+import type { Route } from './+types/npcs._index';
 
 import { data, Form, Link } from 'react-router';
-import { getItemList } from '~/.server/items';
 import { useDebounce } from '@uidotdev/usehooks';
+import { getNpcList } from '~/.server/npcs';
 
 export function links() {
-  return [{ rel: 'canonical', href: 'https://endless-online.info/items' }];
+  return [{ rel: 'canonical', href: 'https://endless-online.info/npcs' }];
 }
 
 export function meta() {
   return [
-    { title: 'EOR Database - Items' },
-    { name: 'og:title', content: 'EOR Database - Items' },
-    { name: 'og:url', content: 'https://endless-online.info/items' },
+    { title: 'EOR Database - NPCs' },
+    { name: 'og:title', content: 'EOR Database - NPCs' },
+    { name: 'og:url', content: 'https://endless-online.info/npcs' },
     {
       name: 'og:description',
-      content: 'Endless Online Item Search',
+      content: 'Endless Online NPC Search',
     },
     {
       name: 'description',
-      content: 'Endless Online Item Search',
+      content: 'Endless Online NPC Search',
     },
   ];
 }
@@ -32,15 +32,15 @@ export async function loader({ request }: Route.LoaderArgs) {
     type: url.searchParams.get('type') || 'all',
   };
 
-  const items = await getItemList(search);
+  const npcs = await getNpcList(search);
   return data({
-    items,
+    npcs,
     search,
   });
 }
 
-export default function Items({ loaderData }: Route.ComponentProps) {
-  const { items, search } = loaderData;
+export default function Npcs({ loaderData }: Route.ComponentProps) {
+  const { npcs, search } = loaderData;
 
   const [name, setName] = useState(search.name);
   const [type, setType] = useState(search.type);
@@ -97,47 +97,19 @@ export default function Items({ loaderData }: Route.ComponentProps) {
             }}
           >
             <option value="all">All Types</option>
-            <option value="0">Static</option>
-            <option value="1">General</option>
-            <option value="2">Money</option>
-            <option value="3">Potion</option>
-            <option value="4">Teleport</option>
-            <option value="5">Transformation</option>
-            <option value="6">EXP Reward</option>
-            <option value="7">Skill Book</option>
-            <option value="8">Reserved</option>
-            <option value="9">Key</option>
-            <option value="10">Weapon</option>
-            <option value="11">Shield</option>
-            <option value="12">Clothing</option>
-            <option value="13">Hat</option>
-            <option value="14">Boots</option>
-            <option value="15">Gloves</option>
-            <option value="16">Accessory</option>
-            <option value="17">Belt</option>
-            <option value="18">Necklace</option>
-            <option value="19">Ring</option>
-            <option value="20">Bracelet</option>
-            <option value="21">Bracer</option>
-            <option value="22">Costume</option>
-            <option value="23">Costume Hat</option>
-            <option value="24">Wings</option>
-            <option value="25">Buddy</option>
-            <option value="26">Buddy 2</option>
-            <option value="27">Torch</option>
-            <option value="28">Beverage</option>
-            <option value="29">Effect</option>
-            <option value="30">Hairdye</option>
-            <option value="31">Hairtool</option>
-            <option value="32">Cure</option>
-            <option value="33">Title</option>
-            <option value="34">Visual Document</option>
-            <option value="35">Audio Document</option>
-            <option value="36">Transport Ticket</option>
-            <option value="37">Fireworks</option>
-            <option value="38">Explosive</option>
-            <option value="39">Buff</option>
-            <option value="40">Debuff</option>
+            <option value="0">Friendly</option>
+            <option value="1">Passive</option>
+            <option value="2">Aggressive</option>
+            <option value="5">Crafting</option>
+            <option value="6">Shop</option>
+            <option value="7">Inn Keeper</option>
+            <option value="9">Bank</option>
+            <option value="10">Barber</option>
+            <option value="11">Guild Master</option>
+            <option value="12">Priest</option>
+            <option value="13">Lawyer</option>
+            <option value="14">Trainer</option>
+            <option value="15">Quest</option>
           </select>
         </div>
 
@@ -147,7 +119,7 @@ export default function Items({ loaderData }: Route.ComponentProps) {
           </button>
         </div>
       </Form>
-      {items.length === 0 ? (
+      {npcs.length === 0 ? (
         <div className="flex h-60 items-center justify-center">
           <div className="card bg-base-200 text-center shadow-xl">
             <div className="card-body">
@@ -162,18 +134,18 @@ export default function Items({ loaderData }: Route.ComponentProps) {
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {items.slice(0, 50).map((item) => (
+          {npcs.slice(0, 50).map((npc) => (
             <Link
-              to={`/items/${item.id}`}
-              key={item.id}
+              to={`/npcs/${npc.id}`}
+              key={npc.id}
               className="card bg-base-200 p-4 shadow-xl"
             >
               <img
-                src={`https://eor-api.exile-studios.com/api/items/${item.id}/graphic/ground`}
-                alt={item.name}
+                src={`https://eor-api.exile-studios.com/api/npcs/${npc.id}/graphic`}
+                alt={npc.name}
                 className="h-16 w-full object-contain"
               />
-              <div className="mt-2 text-center font-bold">{item.name}</div>
+              <div className="mt-2 text-center font-bold">{npc.name}</div>
             </Link>
           ))}
         </div>

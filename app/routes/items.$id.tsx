@@ -12,6 +12,31 @@ import { getItemType } from '~/utils/get-item-type';
 import { capitalize } from '~/utils/capitalize';
 import { getClassById } from '~/.server/classes';
 
+export function meta({ data }: Route.MetaArgs) {
+  const { item } = data;
+  if (!item) {
+    return [];
+  }
+
+  return [
+    { title: `EOR Database - ${item.name}` },
+    { name: 'og:title', content: `EOR Database - ${item.name}` },
+    { name: 'og:url', content: `https://endless-online.info/items/${item.id}` },
+    {
+      name: 'og:image',
+      content: `https://eor-api.exile-studios.com/api/items/${item.id}/graphic`,
+    },
+    {
+      name: 'og:description',
+      content: `Stats, drops, crafting recipes, and more for ${item.name} in Endless Online`,
+    },
+    {
+      name: 'description',
+      content: `Stats, drops, crafting recipes, and more for ${item.name} in Endless Online`,
+    },
+  ];
+}
+
 export async function loader({ params }: Route.LoaderArgs) {
   const id = Number.parseInt(params.id, 10);
   const item = await getItemById(id);
