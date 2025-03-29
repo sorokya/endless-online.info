@@ -14,11 +14,15 @@ const ShopBuy = z.object({
   price: z.number(),
 });
 
+const ShopCraft = z.object({
+  item_id: z.number(),
+});
+
 const ShopSchema = z.object({
   name: z.string(),
   npcs: z.array(ShopNpc),
   buys: z.array(ShopBuy),
-  crafts: z.array(z.number()),
+  crafts: z.array(ShopCraft),
 });
 
 const ShopArraySchema = z.array(ShopSchema);
