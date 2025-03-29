@@ -163,14 +163,14 @@ export default function App() {
         <footer className="mt-auto bg-base-200 p-4 text-center">
           <div className="text-sm">
             <p>
-              &copy; 2025
+              &copy; 2025{' '}
               <a href="https://leek.cafe" className="link">
                 Richard Leek
               </a>
               . All Rights Reserved.
             </p>
             <p>
-              Powered by
+              Powered by{' '}
               <a href="https://eor-api.exile-studios.com" className="link">
                 EOR API
               </a>
@@ -178,7 +178,7 @@ export default function App() {
             <p>
               <a href="https://endless-online.com" className="link">
                 Endless Online
-              </a>
+              </a>{' '}
               &copy; Copyright 2025{' '}
               <a href="https://www.vult-r.com" className="link">
                 Vult-r
