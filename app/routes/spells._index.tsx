@@ -15,6 +15,7 @@ export function meta() {
     { title: 'EOR Database - Spells' },
     { name: 'og:title', content: 'EOR Database - Spells' },
     { name: 'og:url', content: 'https://endless-online.info/spells' },
+    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
     {
       name: 'og:description',
       content: 'Endless Online Spell Search',

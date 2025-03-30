@@ -15,6 +15,7 @@ export function meta({ data }: Route.MetaArgs) {
       name: 'og:url',
       content: `https://endless-online.info/classes/${cls.id}`,
     },
+    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
     {
       name: 'og:description',
       content: `Stats for ${cls.name} Class in Endless Online`,

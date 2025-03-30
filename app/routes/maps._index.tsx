@@ -15,6 +15,7 @@ export function meta() {
     { title: 'EOR Database - Maps' },
     { name: 'og:title', content: 'EOR Database - Maps' },
     { name: 'og:url', content: 'https://endless-online.info/maps' },
+    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
     {
       name: 'og:description',
       content: 'Endless Online Map Search',

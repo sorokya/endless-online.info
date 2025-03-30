@@ -15,6 +15,7 @@ export function meta() {
     { title: 'EOR Database - Classes' },
     { name: 'og:title', content: 'EOR Database - Classes' },
     { name: 'og:url', content: 'https://endless-online.info/classes' },
+    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
     {
       name: 'og:description',
       content: 'Endless Online Class Search',
