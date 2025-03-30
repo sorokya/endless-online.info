@@ -8,6 +8,7 @@ import {
   getItemGatherSpots,
   getItemIngredientFor,
   getItemRewards,
+  getItemSoldBy,
 } from '~/.server/items';
 import { capitalize } from '~/utils/capitalize';
 import { getItemType } from '~/utils/get-item-type';
@@ -44,6 +45,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const drops = await getItemDrops(id);
   const ingredientFor = await getItemIngredientFor(id);
   const craftables = await getItemCraftables(id);
+  const soldBy = await getItemSoldBy(id);
   const requiredClass = item?.required_class
     ? await getClassById(item.required_class)
     : null;
@@ -60,6 +62,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     rewards,
     gatherSpots,
     chestSpawns,
+    soldBy,
   });
 }
 
@@ -73,6 +76,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
     rewards,
     gatherSpots,
     chestSpawns,
+    soldBy,
   } = loaderData;
 
   if (!item) {
@@ -183,6 +187,45 @@ export default function Item({ loaderData }: Route.ComponentProps) {
             </details>
           )}
 
+          {soldBy.length > 0 && (
+            <details
+              className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
+              open
+            >
+              <summary className="collapse-title font-bold text-xl">
+                Sold by:
+              </summary>
+
+              <div className="mt-1 grid grid-cols-2 gap-4 md:grid-cols-4">
+                {soldBy.map((sell) => (
+                  <div
+                    key={`${sell.npc_name}${sell.map_id}`}
+                    className="card bg-base-200 p-4 shadow-xl"
+                  >
+                    <Link to={`/npcs/${sell.npc_id}`}>
+                      <img
+                        src={`https://eor-api.exile-studios.com/api/npcs/${sell.npc_id}/graphic`}
+                        alt={sell.npc_name}
+                        className="h-16 w-full object-contain"
+                      />
+                      <div className="mt-2 text-center font-bold">
+                        {sell.npc_name}
+                      </div>
+                      <div className="mt-2 text-center font-bold">
+                        {sell.price} Eons
+                      </div>
+                    </Link>
+                    <div className="mt-2 text-center">
+                      <Link to={`/maps/${sell.map_id}`}>
+                        {capitalize(sell.map_name)}
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+
           {craftables.length > 0 && (
             <details
               className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
@@ -205,25 +248,26 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                     <tr key={c.shopName}>
                       <td className="flex gap-1">
                         {c.npcs.map((n) => (
-                          <Link
-                            to={`/npcs/${n.id}`}
-                            key={n.name}
+                          <div
+                            key={`${n.map_name}${n.map_id}`}
                             className="card bg-base-200 p-4 shadow-xl"
                           >
-                            <img
-                              src={`https://eor-api.exile-studios.com/api/npcs/${n.id}/graphic`}
-                              alt={n.name}
-                              className="h-16 w-full object-contain"
-                            />
-                            <div className="mt-2 text-center font-bold">
-                              {n.name}
-                            </div>
+                            <Link to={`/npcs/${n.id}`}>
+                              <img
+                                src={`https://eor-api.exile-studios.com/api/npcs/${n.id}/graphic`}
+                                alt={n.name}
+                                className="h-16 w-full object-contain"
+                              />
+                              <div className="mt-2 text-center font-bold">
+                                {n.name}
+                              </div>
+                            </Link>
                             <div className="mt-2 text-center">
                               <Link to={`/maps/${n.map_id}`}>
                                 {capitalize(n.map_name)}
                               </Link>
                             </div>
-                          </Link>
+                          </div>
                         ))}
                       </td>
                       <td>
@@ -240,24 +284,28 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                           <div className="mt-2 text-center">{c.eons}</div>
                         </Link>
                       </td>
-                      <td className="flex gap-1">
-                        {c.ingredients.map((i) => (
-                          <Link
-                            to={`/items/${i.item_id}`}
-                            key={i.item_id}
-                            className="card bg-base-200 p-4 shadow-xl"
-                          >
-                            <img
-                              src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
-                              alt={i.item_name}
-                              className="transform-[scale(2)] m-auto"
-                            />
-                            <div className="mt-2 text-center font-bold">
-                              {i.item_name}
-                            </div>
-                            <div className="mt-2 text-center">{i.quantity}</div>
-                          </Link>
-                        ))}
+                      <td>
+                        <div className="flex gap-1">
+                          {c.ingredients.map((i) => (
+                            <Link
+                              to={`/items/${i.item_id}`}
+                              key={i.item_id}
+                              className="card bg-base-200 p-4 shadow-xl"
+                            >
+                              <img
+                                src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
+                                alt={i.item_name}
+                                className="transform-[scale(2)] m-auto"
+                              />
+                              <div className="mt-2 text-center font-bold">
+                                {i.item_name}
+                              </div>
+                              <div className="mt-2 text-center">
+                                {i.quantity}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -283,25 +331,26 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       </summary>
                       <div className="collapse-content flex flex-wrap justify-center gap-2">
                         {c.npcs.map((n) => (
-                          <Link
-                            to={`/npcs/${n.id}`}
-                            key={n.name}
+                          <div
                             className="card w-24 bg-base-100 p-3 text-center shadow-md"
+                            key={`${n.name}${n.map_id}`}
                           >
-                            <img
-                              src={`https://eor-api.exile-studios.com/api/npcs/${n.id}/graphic`}
-                              alt={n.name}
-                              className="h-16 w-full object-contain"
-                            />
-                            <div className="mt-1 font-bold text-sm">
-                              {n.name}
-                            </div>
+                            <Link to={`/npcs/${n.id}`}>
+                              <img
+                                src={`https://eor-api.exile-studios.com/api/npcs/${n.id}/graphic`}
+                                alt={n.name}
+                                className="h-16 w-full object-contain"
+                              />
+                              <div className="mt-1 font-bold text-sm">
+                                {n.name}
+                              </div>
+                            </Link>
                             <div className="text-xs">
                               <Link to={`/maps/${n.map_id}`}>
                                 {capitalize(n.map_name)}
                               </Link>
                             </div>
-                          </Link>
+                          </div>
                         ))}
                       </div>
                     </details>
@@ -396,7 +445,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 {rewards.map((reward) => (
                   <Link
                     to={`/quests/${reward.quest_id}`}
-                    key={reward.npc_id}
+                    key={`${reward.npc_id}${reward.quest_id}${reward.amount}${reward.quest_id}`}
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <img
@@ -461,7 +510,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 {chestSpawns.map((spawn) => (
                   <Link
                     to={`/maps/${spawn.map_id}`}
-                    key={spawn.map_id}
+                    key={`map=${spawn.map_id}x=${spawn.x}y=${spawn.y}slot=${spawn.slot}amount=${spawn.amount}`}
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     {spawn.graphic_id && (

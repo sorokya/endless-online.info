@@ -316,6 +316,60 @@ export async function getItemCraftables(id: number): Promise<Craftable[]> {
   );
 }
 
+type ItemSoldBy = {
+  npc_id: number;
+  npc_name: string;
+  price: number;
+  x: number;
+  y: number;
+  map_id: number;
+  map_name: string;
+};
+
+export async function getItemSoldBy(id: number): Promise<ItemSoldBy[]> {
+  const item = await getItemById(id);
+  if (!item?.soldBy) {
+    return [];
+  }
+
+  const soldBy = await Promise.all(
+    item.soldBy.map(async (s) => {
+      const shop = await getShopByName(s.soldByName);
+      if (!shop) {
+        return undefined;
+      }
+
+      const buy = shop.buys.find((b) => b.item_id === item.id);
+      if (!buy) {
+        return undefined;
+      }
+
+      const npcs = await Promise.all(
+        shop.npcs.map(async (n) => {
+          const npc = await getNpcByName(n.npc_name);
+          if (!npc) {
+            return undefined;
+          }
+
+          return {
+            x: n.x,
+            y: n.y,
+            map_id: n.map_id,
+            map_name: n.map_name,
+            npc_id: npc.id,
+            npc_name: npc.name,
+            price: buy.price,
+          };
+        }),
+      );
+
+      return npcs.filter((n) => !!n);
+    }),
+  );
+
+  return soldBy.filter((s) => !!s).flat();
+}
+
 type Reward = {
   quest_id: number;
   quest_name: string;
@@ -329,16 +383,18 @@ export async function getItemRewards(id: number): Promise<Reward[]> {
     return [];
   }
 
+  const questNames = new Set(item.questRewards.map((r) => r.questName));
+
   const rewards = await Promise.all(
-    item.questRewards.map(async (r) => {
-      const quest = await getQuestByName(r.questName);
+    Array.from(questNames).map(async (name) => {
+      const quest = await getQuestByName(name);
       if (!quest) {
         return undefined;
       }
 
       const questRewards = quest.item_rewards_1.concat(quest.item_rewards_2);
-      const reward = questRewards.find((r) => r.item_id === id);
-      if (!reward) {
+      const rewards = questRewards.filter((r) => r.item_id === id);
+      if (!rewards) {
         return undefined;
       }
 
@@ -347,16 +403,20 @@ export async function getItemRewards(id: number): Promise<Reward[]> {
         return undefined;
       }
 
-      return {
+      if (quest.id === 248) {
+        console.log('rewards', rewards);
+      }
+
+      return rewards.flatMap((re) => ({
         quest_id: quest.id,
-        quest_name: r.questName,
+        quest_name: name,
         npc_id: npc.id,
-        amount: reward.amount,
-      };
+        amount: re.amount,
+      }));
     }),
   );
 
-  return rewards.filter((r) => !!r);
+  return rewards.filter((r) => !!r).flat();
 }
 
 type GatherSpot = {

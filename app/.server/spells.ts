@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { CONFIG } from '~/config';
 
 const SpellSchema = z.object({
   id: z.number(),
@@ -19,8 +20,6 @@ const SpellSchema = z.object({
   max_damage: z.number(),
   accuracy: z.number(),
   hp: z.number(),
-  icon_url: z.string().url(),
-  graphic_url: z.string().url(),
 });
 
 const SpellArraySchema = z.array(SpellSchema);
@@ -47,12 +46,40 @@ export function reset() {
   SPELLS = null;
 }
 
-export async function getSpellList(): Promise<SpellListEntry[]> {
+type SpellListResult = {
+  count: number;
+  records: SpellListEntry[];
+};
+
+export async function getSpellList(search: {
+  name: string;
+  page: string;
+}): Promise<SpellListResult> {
   const spells = await getSpells();
-  return spells.map((i) => ({
-    id: i.id,
-    name: i.name,
-  }));
+  const filtered = spells
+    .filter((s) => {
+      return (
+        !search.name ||
+        s.name.toLowerCase().indexOf(search.name.toLowerCase()) > -1
+      );
+    })
+    .map((i) => ({
+      id: i.id,
+      name: i.name,
+    }));
+
+  const page = Number.parseInt(search.page, 10);
+  if (Number.isNaN(page)) {
+    throw new Error(`Invalid page: ${search.page}`);
+  }
+
+  const start = CONFIG.PAGE_SIZE * (page - 1);
+  const end = start + CONFIG.PAGE_SIZE;
+
+  return {
+    count: filtered.length,
+    records: filtered.slice(start, end),
+  };
 }
 
 export async function getSpellById(id: number): Promise<Spell | undefined> {

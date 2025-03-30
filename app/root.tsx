@@ -187,6 +187,14 @@ export default function App() {
           </div>
         </footer>
       </div>
+
+      {process.env.NODE_ENV !== 'development' && (
+        <script
+          defer
+          src="https://stats.richardleek.com/script.js"
+          data-website-id="ad0d67d9-d46d-4ea2-a455-13a64e1d1b43"
+        />
+      )}
     </>
   );
 }

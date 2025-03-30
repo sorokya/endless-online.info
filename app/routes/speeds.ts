@@ -1,9 +1,9 @@
 import { data } from 'react-router';
-import { getMaps } from '~/.server/maps';
+import { loadMaps } from '~/.server/maps';
 import { getNpcById } from '~/.server/npcs';
 
 export async function loader() {
-  const maps = await getMaps();
+  const maps = await loadMaps();
 
   type Npc = {
     npc_id: number;

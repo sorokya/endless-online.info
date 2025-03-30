@@ -3,3 +3,7 @@
   /* biome-ignore lint/correctness/noUnknownProperty: DaisyUI Setup */
   themes: dark --default;
 }
+
+.spell-icon:hover div {
+  background-position: -34px 0;
+}

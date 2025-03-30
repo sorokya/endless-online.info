@@ -1,8 +1,8 @@
 import { data } from 'react-router';
-import { type Map as MapType, getMaps } from '~/.server/maps';
+import { type Map as MapType, loadMaps } from '~/.server/maps';
 
 export async function loader() {
-  const maps = await getMaps();
+  const maps = await loadMaps();
   return data(getMap(15, maps));
 }
 
