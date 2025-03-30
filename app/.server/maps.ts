@@ -1,5 +1,9 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
+import { CONFIG } from '~/config';
+import { getItemById } from './items';
+import { MapTileSpec } from './map-tile-spec';
+import { getNpcById } from './npcs';
 
 const Npc = z.object({
   x: z.number(),
@@ -74,6 +78,15 @@ const MapSchema = z.object({
   width: z.number(),
   height: z.number(),
   name: z.string(),
+  scroll_allow: z.number(),
+  minimap_allow: z.number(),
+  channel_busy: z.number(),
+  channel_full: z.number(),
+  daymode: z.number(),
+  daymode_override: z.number(),
+  weather_type: z.number(),
+  respawn_x: z.number(),
+  respawn_y: z.number(),
   wayfarer_id: z.number(),
   wayfarer_x: z.number(),
   wayfarer_y: z.number(),
@@ -109,15 +122,218 @@ export function reset() {
   MAPS = null;
 }
 
-export async function getMapList(): Promise<MapListEntry[]> {
+type MapListResult = {
+  count: number;
+  records: MapListEntry[];
+};
+
+export async function getMapList(search: {
+  name: string;
+  page: string;
+}): Promise<MapListResult> {
   const maps = await getMaps();
-  return maps.map((i) => ({
-    id: i.id,
-    name: i.name,
-  }));
+  const filtered = maps
+    .filter((i) => {
+      return (
+        !search.name ||
+        i.name.toLowerCase().indexOf(search.name.toLowerCase()) > -1
+      );
+    })
+    .map((i) => ({
+      id: i.id,
+      name: i.name || '???',
+    }));
+
+  const page = Number.parseInt(search.page, 10);
+  if (Number.isNaN(page)) {
+    throw new Error(`Invalid page: ${search.page}`);
+  }
+
+  const start = CONFIG.PAGE_SIZE * (page - 1);
+  const end = start + CONFIG.PAGE_SIZE;
+
+  return {
+    count: filtered.length,
+    records: filtered.slice(start, end),
+  };
 }
 
 export async function getMapById(id: number): Promise<Map | undefined> {
   const maps = await getMaps();
   return maps.find((i) => i.id === id);
+}
+
+type NpcSpawn = {
+  id: number;
+  name: string;
+  x: number;
+  y: number;
+  amount: number;
+  speed: number;
+  time: number;
+};
+
+export async function getMapNpcSpawns(id: number): Promise<NpcSpawn[]> {
+  const map = await getMapById(id);
+  if (!map) {
+    return [];
+  }
+
+  const spawns = await Promise.all(
+    map.npcs.map(async (spawn) => {
+      const npc = await getNpcById(spawn.id);
+      if (!npc) {
+        return undefined;
+      }
+
+      return {
+        id: npc.id,
+        name: npc.name,
+        x: spawn.x,
+        y: spawn.y,
+        amount: spawn.amount,
+        speed: spawn.speed || npc.npc_default_speed,
+        time: spawn.time > 0 ? spawn.time : npc.npc_respawn_secs,
+      };
+    }),
+  );
+
+  return spawns.filter((s) => !!s);
+}
+
+type GatherSpot = {
+  item_id: number;
+  item_name: string;
+  x: number;
+  y: number;
+  amount: number;
+  graphic_id: number;
+};
+
+export async function getMapGatherSpots(id: number): Promise<GatherSpot[]> {
+  const map = await getMapById(id);
+  if (!map?.map_gathers) {
+    return [];
+  }
+
+  const spots = await Promise.all(
+    map.map_gathers.map(async (gather) => {
+      const item = await getItemById(gather.item_id);
+
+      if (!item) {
+        return undefined;
+      }
+
+      return {
+        item_id: item.id,
+        item_name: item.name,
+        x: gather.x,
+        y: gather.y,
+        amount: gather.max_amount,
+        graphic_id: gather.graphic_id + 100,
+      };
+    }),
+  );
+
+  return spots.filter((s) => !!s);
+}
+
+type Chest = {
+  x: number;
+  y: number;
+  graphic_id: number | undefined;
+  spawns: ChestSpawn[];
+};
+
+type ChestSpawn = {
+  item_id: number;
+  item_name: string;
+  amount: number;
+  slot: number;
+  time: number;
+};
+
+export async function getMapChests(id: number): Promise<Chest[]> {
+  const map = await getMapById(id);
+  if (!map) {
+    return [];
+  }
+
+  const getObjectGraphicAt = (x: number, y: number) => {
+    const objectLayer = map.map_layers.find((l) => l.details.name === 'Object');
+    if (!objectLayer?.tiles) {
+      return undefined;
+    }
+
+    const tile = objectLayer.tiles.find((t) => t.x === x && t.y === y);
+    if (!tile) {
+      return undefined;
+    }
+
+    return tile.tile;
+  };
+
+  const mapHasChestSpecAt = (x: number, y: number) => {
+    const tile = map.spec_tiles.find((t) => t.x === x && t.y === y);
+    if (!tile) {
+      return undefined;
+    }
+
+    return tile.spec === MapTileSpec.Chest;
+  };
+
+  const spawns = (
+    await Promise.all(
+      map.items.map(async (i) => {
+        const item = await getItemById(i.item_id);
+        if (!item || !mapHasChestSpecAt(i.x, i.y)) {
+          return undefined;
+        }
+
+        return {
+          item_id: item.id,
+          item_name: item.name,
+          x: i.x,
+          y: i.y,
+          amount: i.amount,
+          slot: i.slot,
+          time: i.time,
+          key: i.key,
+          graphic_id: getObjectGraphicAt(i.x, i.y),
+        };
+      }),
+    )
+  ).filter((s) => !!s);
+
+  const chests: Chest[] = [];
+
+  for (const spawn of spawns) {
+    const chest = chests.find((c) => c.x === spawn.x && c.y === spawn.y);
+    if (chest) {
+      chest.spawns.push({
+        item_id: spawn.item_id,
+        item_name: spawn.item_name,
+        amount: spawn.amount,
+        time: spawn.time,
+        slot: spawn.slot,
+      });
+    } else {
+      chests.push({
+        x: spawn.x,
+        y: spawn.y,
+        graphic_id: spawn.graphic_id,
+        spawns: [
+          {
+            item_id: spawn.item_id,
+            item_name: spawn.item_name,
+            amount: spawn.amount,
+            time: spawn.time,
+            slot: spawn.slot,
+          },
+        ],
+      });
+    }
+  }
+
+  return chests;
 }

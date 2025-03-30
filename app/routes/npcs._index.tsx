@@ -46,6 +46,7 @@ export default function Npcs({ loaderData }: Route.ComponentProps) {
 
   const [name, setName] = useState(search.name);
   const [type, setType] = useState(search.type);
+  const [page, setPage] = useState(search.page);
 
   const debouncedName = useDebounce(name, 300);
 
@@ -55,6 +56,7 @@ export default function Npcs({ loaderData }: Route.ComponentProps) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: Run effect when name changes
   useEffect(() => {
     if (formRef.current) {
+      setPage('1');
       formRef.current.requestSubmit();
     }
   }, [debouncedName]);
@@ -160,7 +162,7 @@ export default function Npcs({ loaderData }: Route.ComponentProps) {
           </select>
         </div>
 
-        <input name="page" type="hidden" value={search.page} />
+        <input name="page" type="hidden" value={page} />
 
         <div className="mt-6">
           <button type="submit" className="btn btn-primary">

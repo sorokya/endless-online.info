@@ -92,6 +92,15 @@ export default function App() {
         </li>
         <li>
           <NavLink
+            to="/maps"
+            className={({ isActive }) => (isActive ? 'menu-active' : '')}
+            onClick={() => dismissMenu()}
+          >
+            Maps
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
             to="/quests"
             className={({ isActive }) => (isActive ? 'menu-active' : '')}
             onClick={() => dismissMenu()}

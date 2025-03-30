@@ -476,7 +476,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                 {gatherSpots.map((spot) => (
                   <Link
                     to={`/maps/${spot.map_id}`}
-                    key={spot.map_id}
+                    key={`${spot.map_id}${spot.x}${spot.y}`}
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <img
@@ -488,9 +488,11 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       {spot.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      {spot.x}, {spot.y}
+                      Coords: {spot.x}, {spot.y}
                     </div>
-                    <div className="mt-2 text-center">{spot.amount}</div>
+                    <div className="mt-2 text-center">
+                      Amount: {spot.amount}
+                    </div>
                   </Link>
                 ))}
               </div>

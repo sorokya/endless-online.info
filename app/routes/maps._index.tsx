@@ -1,27 +1,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Route } from './+types/spells._index';
+import type { Route } from './+types/maps._index';
 
 import { useDebounce } from '@uidotdev/usehooks';
 import { Form, Link, data } from 'react-router';
-import { getSpellList } from '~/.server/spells';
+import { getMapList } from '~/.server/maps';
 import { CONFIG } from '~/config';
 
 export function links() {
-  return [{ rel: 'canonical', href: 'https://endless-online.info/classes' }];
+  return [{ rel: 'canonical', href: 'https://endless-online.info/maps' }];
 }
 
 export function meta() {
   return [
-    { title: 'EOR Database - Spells' },
-    { name: 'og:title', content: 'EOR Database - Spells' },
-    { name: 'og:url', content: 'https://endless-online.info/spells' },
+    { title: 'EOR Database - Maps' },
+    { name: 'og:title', content: 'EOR Database - Maps' },
+    { name: 'og:url', content: 'https://endless-online.info/maps' },
     {
       name: 'og:description',
-      content: 'Endless Online Spell Search',
+      content: 'Endless Online Map Search',
     },
     {
       name: 'description',
-      content: 'Endless Online Spell Search',
+      content: 'Endless Online Map Search',
     },
   ];
 }
@@ -30,19 +30,18 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const search = {
     name: url.searchParams.get('name') || '',
-    type: url.searchParams.get('type') || 'all',
     page: url.searchParams.get('page') || '1',
   };
 
-  const spells = await getSpellList(search);
+  const maps = await getMapList(search);
   return data({
-    spells,
+    maps,
     search,
   });
 }
 
-export default function Classes({ loaderData }: Route.ComponentProps) {
-  const { spells, search } = loaderData;
+export default function Maps({ loaderData }: Route.ComponentProps) {
+  const { maps, search } = loaderData;
 
   const [name, setName] = useState(search.name);
   const [page, setPage] = useState(search.page);
@@ -61,8 +60,8 @@ export default function Classes({ loaderData }: Route.ComponentProps) {
   }, [debouncedName]);
 
   const pageCount = useMemo(
-    () => Math.ceil(spells.count / CONFIG.PAGE_SIZE),
-    [spells],
+    () => Math.ceil(maps.count / CONFIG.PAGE_SIZE),
+    [maps],
   );
 
   const getSearchParams = useCallback(
@@ -135,7 +134,7 @@ export default function Classes({ loaderData }: Route.ComponentProps) {
           </button>
         </div>
       </Form>
-      {spells.records.length === 0 ? (
+      {maps.records.length === 0 ? (
         <div className="flex h-60 items-center justify-center">
           <div className="card bg-base-200 text-center shadow-xl">
             <div className="card-body">
@@ -151,21 +150,13 @@ export default function Classes({ loaderData }: Route.ComponentProps) {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {spells.records.map((s) => (
+            {maps.records.map((map) => (
               <Link
-                to={`/spells/${s.id}`}
-                key={s.id}
-                className="card spell-icon bg-base-200 p-4 shadow-xl"
+                to={`/maps/${map.id}`}
+                key={map.id}
+                className="card bg-base-200 p-4 shadow-xl"
               >
-                <div
-                  style={{
-                    width: 34,
-                    height: 32,
-                    margin: 'auto',
-                    backgroundImage: `url(https://eor-api.exile-studios.com/api/spells/${s.id}/icon)`,
-                  }}
-                />
-                <div className="mt-2 text-center font-bold">{s.name}</div>
+                <div className="mt-2 text-center font-bold">{map.name}</div>
               </Link>
             ))}
           </div>

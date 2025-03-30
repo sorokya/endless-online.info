@@ -213,7 +213,7 @@ export async function getNpcSpawns(id: number): Promise<NpcSpawn[]> {
         x: n.x,
         y: n.y,
         amount: n.amount,
-        respawn: n.time,
+        respawn: n.time || npc.npc_respawn_secs,
         speed: n.speed || npc.npc_default_speed,
       })),
     )

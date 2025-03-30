@@ -30,7 +30,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const search = {
     name: url.searchParams.get('name') || '',
-    type: url.searchParams.get('type') || 'all',
     page: url.searchParams.get('page') || '1',
   };
 
