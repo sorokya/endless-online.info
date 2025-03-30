@@ -234,7 +234,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
               <summary className="collapse-title font-bold text-xl">
                 Crafted at:
               </summary>
-              j
+
               <table className="hidden lg:table">
                 <thead>
                   <tr>

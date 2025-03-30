@@ -136,9 +136,9 @@ export default function Npc({ loaderData }: Route.ComponentProps) {
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <img
-                      src={`https://eor-api.exile-studios.com/api/items/${drop.id}/graphic`}
+                      src={`https://eor-api.exile-studios.com/api/items/${drop.id}/graphic/ground`}
                       alt={drop.name}
-                      className="h-8 w-full object-contain"
+                      className="transform-[scale(2)] mx-auto mt-4"
                     />
                     <div className="mt-2 text-center font-bold">
                       {drop.name}

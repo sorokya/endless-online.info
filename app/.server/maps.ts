@@ -562,3 +562,12 @@ export async function getMapPreviewWithArrow(
 
   return canvas.toDataURL();
 }
+
+export async function getMapNameById(id: number): Promise<string> {
+  const map = await getMapById(id);
+  if (!map) {
+    return '';
+  }
+
+  return map.name;
+}
