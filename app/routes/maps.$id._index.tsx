@@ -10,7 +10,7 @@ import {
 import { getLightMode } from '~/utils/get-light-mode';
 import { getNpcSpeed } from '~/utils/get-npc-speed';
 import { getWeatherType } from '~/utils/get-weather-type';
-import type { Route } from './+types/maps.$id';
+import type { Route } from './+types/maps.$id._index';
 
 export function meta({ data }: Route.MetaArgs) {
   const { map } = data;
@@ -79,6 +79,8 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
         <div className="card-body">
           <h2 className="mb-4 text-center font-bold text-2xl">{map.name}</h2>
 
+          <img src={`/maps/${map.id}/preview`} alt="Map Preview" />
+
           <details
             className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
             open
@@ -145,7 +147,13 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                       {spawn.name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {spawn.x}, {spawn.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${map.id}/find?x=${spawn.x}&y=${spawn.y}`}
+                        className="link-info"
+                      >
+                        {spawn.x}, {spawn.y}
+                      </Link>
                     </div>
                     <div className="mt-2 text-center">
                       Respawn: {spawn.time}s
@@ -187,7 +195,13 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                       {spot.item_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {spot.x}, {spot.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${map.id}/find?x=${spot.x}&y=${spot.y}`}
+                        className="link-info"
+                      >
+                        {spot.x}, {spot.y}
+                      </Link>
                     </div>
                     <div className="mt-2 text-center">
                       Amount: {spot.amount}
@@ -227,7 +241,13 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                             />
                           )}
                           <div className="mt-2 text-center">
-                            Coords: {c.x}, {c.y}
+                            Coords:{' '}
+                            <Link
+                              to={`/maps/${map.id}/find?x=${c.x}&y=${c.y}`}
+                              className="link-info"
+                            >
+                              {c.x}, {c.y}
+                            </Link>
                           </div>
                         </div>
                       </td>
@@ -273,7 +293,13 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                       open
                     >
                       <summary className="collapse-title font-semibold">
-                        Coords: {c.x}, {c.y}
+                        Coords:{' '}
+                        <Link
+                          to={`/maps/${map.id}/find?x=${c.x}&y=${c.y}`}
+                          className="link-info"
+                        >
+                          {c.x}, {c.y}
+                        </Link>
                       </summary>
                       <div className="collapse-content flex flex-wrap justify-center gap-2">
                         {c.graphic_id && (
@@ -338,11 +364,23 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <div className="mt-2 text-center font-bold">
-                      {warp.map_name} ({warp.destination_x},{' '}
-                      {warp.destination_y})
+                      {warp.map_name} (
+                      <Link
+                        to={`/maps/${warp.map_id}/find?x=${warp.destination_x}&y=${warp.destination_y}`}
+                        className="link-info"
+                      >
+                        {warp.destination_x}, {warp.destination_y}
+                      </Link>
+                      )
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {warp.x}, {warp.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${map.id}/find?x=${warp.x}&y=${warp.y}`}
+                        className="link-info"
+                      >
+                        {warp.x}, {warp.y}
+                      </Link>
                     </div>
                   </Link>
                 ))}
@@ -376,7 +414,13 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                       {sign.message}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {sign.x}, {sign.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${map.id}/find?x=${sign.x}&y=${sign.y}`}
+                        className="link-info"
+                      >
+                        {sign.x}, {sign.y}
+                      </Link>
                     </div>
                   </div>
                 ))}

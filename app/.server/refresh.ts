@@ -35,6 +35,8 @@ export async function refresh(request: Request) {
     await fs.writeFile(`data/${resource}.json`, data, 'utf8');
   }
 
+  await fs.rm('data/maps', { recursive: true, force: true });
+
   resetClasses();
   resetItems();
   resetMaps();

@@ -234,7 +234,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
               <summary className="collapse-title font-bold text-xl">
                 Crafted at:
               </summary>
-
+              j
               <table className="hidden lg:table">
                 <thead>
                   <tr>
@@ -311,7 +311,6 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                   ))}
                 </tbody>
               </table>
-
               <div className="space-y-4 lg:hidden">
                 {craftables.map((c) => (
                   <div
@@ -488,7 +487,13 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       {spot.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {spot.x}, {spot.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${spot.map_id}/find?x=${spot.x}&y=${spot.y}`}
+                        className="link-info"
+                      >
+                        {spot.x}, {spot.y}
+                      </Link>
                     </div>
                     <div className="mt-2 text-center">
                       Amount: {spot.amount}
@@ -526,7 +531,13 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       {spawn.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {spawn.x}, {spawn.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${spawn.map_id}/find?x=${spawn.x}&y=${spawn.y}`}
+                        className="link-info"
+                      >
+                        {spawn.x}, {spawn.y}
+                      </Link>
                     </div>
                     <div className="mt-2 text-center">
                       Amount: {spawn.amount}

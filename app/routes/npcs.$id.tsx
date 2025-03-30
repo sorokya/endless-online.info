@@ -344,7 +344,13 @@ export default function Npc({ loaderData }: Route.ComponentProps) {
                       {spawn.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords: {spawn.x}, {spawn.y}
+                      Coords:{' '}
+                      <Link
+                        to={`/maps/${spawn.map_id}/find?x=${spawn.x}&y=${spawn.y}`}
+                        className="link-info"
+                      >
+                        {spawn.x}, {spawn.y}
+                      </Link>
                     </div>
                     <div className="mt-2 text-center">
                       Respawn:{' '}

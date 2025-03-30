@@ -156,6 +156,11 @@ export default function Maps({ loaderData }: Route.ComponentProps) {
                 key={map.id}
                 className="card bg-base-200 p-4 shadow-xl"
               >
+                <img
+                  src={`/maps/${map.id}/preview`}
+                  alt="Map Preview"
+                  className="h-32"
+                />
                 <div className="mt-2 text-center font-bold">{map.name}</div>
               </Link>
             ))}
