@@ -5,6 +5,7 @@ import {
   getMapGatherSpots,
   getMapNpcSpawns,
   getMapSigns,
+  getMapWarps,
 } from '~/.server/maps';
 import { getLightMode } from '~/utils/get-light-mode';
 import { getNpcSpeed } from '~/utils/get-npc-speed';
@@ -42,6 +43,7 @@ export async function loader({ params }: Route.LoaderArgs) {
   const gatherSpots = await getMapGatherSpots(id);
   const chests = await getMapChests(id);
   const signs = await getMapSigns(id);
+  const warps = await getMapWarps(id);
 
   return data({
     map,
@@ -49,11 +51,12 @@ export async function loader({ params }: Route.LoaderArgs) {
     gatherSpots,
     chests,
     signs,
+    warps,
   });
 }
 
 export default function MapPage({ loaderData }: Route.ComponentProps) {
-  const { map, npcSpawns, gatherSpots, chests, signs } = loaderData;
+  const { map, npcSpawns, gatherSpots, chests, signs, warps } = loaderData;
 
   if (!map) {
     return (
@@ -313,6 +316,35 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                       </div>
                     </details>
                   </div>
+                ))}
+              </div>
+            </details>
+          )}
+
+          {warps.length > 0 && (
+            <details
+              className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
+              open
+            >
+              <summary className="collapse-title font-bold text-xl">
+                Warps:
+              </summary>
+
+              <div className="mt-1 grid grid-cols-2 gap-4 md:grid-cols-4">
+                {warps.map((warp) => (
+                  <Link
+                    to={`/maps/${warp.map_id}`}
+                    key={`${warp.x}${warp.y}`}
+                    className="card bg-base-200 p-4 shadow-xl"
+                  >
+                    <div className="mt-2 text-center font-bold">
+                      {warp.map_name} ({warp.destination_x},{' '}
+                      {warp.destination_y})
+                    </div>
+                    <div className="mt-2 text-center">
+                      Coords: {warp.x}, {warp.y}
+                    </div>
+                  </Link>
                 ))}
               </div>
             </details>

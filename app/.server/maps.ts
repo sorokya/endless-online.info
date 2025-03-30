@@ -384,3 +384,39 @@ export async function getMapSigns(id: number): Promise<MapSign[]> {
     graphic_id: getObjectGraphicAt(sign.x, sign.y),
   }));
 }
+
+type MapWarp = {
+  x: number;
+  y: number;
+  map_id: number;
+  map_name: string;
+  destination_x: number;
+  destination_y: number;
+};
+
+export async function getMapWarps(id: number): Promise<MapWarp[]> {
+  const map = await getMapById(id);
+  if (!map) {
+    return [];
+  }
+
+  const warps = await Promise.all(
+    map.warp_tiles.map(async (warp) => {
+      const map = await getMapById(warp.destination_id);
+      if (!map) {
+        return undefined;
+      }
+
+      return {
+        x: warp.x,
+        y: warp.y,
+        map_id: map.id,
+        map_name: map.name,
+        destination_x: warp.destination_x,
+        destination_y: warp.destination_y,
+      };
+    }),
+  );
+
+  return warps.filter((w) => !!w);
+}
