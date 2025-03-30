@@ -15,7 +15,7 @@ export function meta() {
     { title: 'EOR Database - Quests' },
     { name: 'og:title', content: 'EOR Database - Quests' },
     { name: 'og:url', content: 'https://endless-online.info/quests' },
-    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
+    { name: 'og:image', content: 'https://endless-online.info/icon.png' },
     {
       name: 'og:description',
       content: 'Endless Online Quest Search',

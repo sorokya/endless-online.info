@@ -3,7 +3,7 @@ export function meta() {
     { title: 'EOR Database' },
     { name: 'og:title', content: 'EOR Database - Guides' },
     { name: 'og:url', content: 'https://endless-online.info/guides' },
-    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
+    { name: 'og:image', content: 'https://endless-online.info/icon.png' },
     {
       name: 'og:description',
       content: 'Guides for all players in Endless Online',

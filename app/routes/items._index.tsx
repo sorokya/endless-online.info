@@ -15,7 +15,7 @@ export function meta() {
     { title: 'EOR Database - Items' },
     { name: 'og:title', content: 'EOR Database - Items' },
     { name: 'og:url', content: 'https://endless-online.info/items' },
-    { name: 'og:image', content: 'https://endless-online.info/app/icon.svg' },
+    { name: 'og:image', content: 'https://endless-online.info/icon.png' },
     {
       name: 'og:description',
       content: 'Endless Online Item Search',
