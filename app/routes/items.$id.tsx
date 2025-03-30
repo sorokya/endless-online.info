@@ -295,7 +295,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                               <img
                                 src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
                                 alt={i.item_name}
-                                className="transform-[scale(2)] m-auto"
+                                className="transform-[scale(2)] mx-auto mt-4"
                               />
                               <div className="mt-2 text-center font-bold">
                                 {i.item_name}
@@ -386,7 +386,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                             <img
                               src={`https://eor-api.exile-studios.com/api/items/${i.item_id}/graphic/ground`}
                               alt={i.item_name}
-                              className="transform-[scale(2)] m-auto"
+                              className="transform-[scale(2)] mx-auto mt-4"
                             />
                             <div className="mt-1 font-bold text-sm">
                               {i.item_name}
@@ -421,7 +421,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                     <img
                       src={`https://eor-api.exile-studios.com/api/items/${item.id}/graphic/ground`}
                       alt={item.name}
-                      className="transform-[scale(2)] m-auto"
+                      className="transform-[scale(2)] mx-auto mt-4"
                     />
                     <div className="mt-2 text-center font-bold">
                       {item.name}
@@ -528,6 +528,9 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                     </div>
                     <div className="mt-2 text-center">
                       Amount: {spawn.amount}
+                    </div>
+                    <div className="mt-2 text-center">
+                      Respawn: {spawn.time} minutes
                     </div>
                   </Link>
                 ))}

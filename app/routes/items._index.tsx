@@ -221,7 +221,7 @@ export default function Items({ loaderData }: Route.ComponentProps) {
                 <img
                   src={`https://eor-api.exile-studios.com/api/items/${item.id}/graphic/ground`}
                   alt={item.name}
-                  className="transform-[scale(2)] m-auto"
+                  className="transform-[scale(2)] mx-auto mt-4"
                 />
                 <div className="mt-2 text-center font-bold">{item.name}</div>
               </Link>
