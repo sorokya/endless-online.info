@@ -531,8 +531,8 @@ export async function getMapPreviewWithArrow(
   const img = new Image();
   img.src = buffer;
 
-  const width = (map.width + map.height) * (TILE_WIDTH / 2);
-  const height = (map.width + map.height) * (TILE_HEIGHT / 2);
+  const width = (map.width + 1 + map.height + 1) * (TILE_WIDTH / 2);
+  const height = (map.width + 1 + map.height + 1) * (TILE_HEIGHT / 2);
   const canvas = createCanvas(width, height);
 
   const ctx = canvas.getContext('2d');
