@@ -2,6 +2,30 @@ import { data } from 'react-router';
 import { getMapById, getMapPreviewWithArrow } from '~/.server/maps';
 import type { Route } from './+types/maps.$id.find';
 
+export function meta({ data }: Route.MetaArgs) {
+  const { map, x, y } = data;
+  if (!map) {
+    return [];
+  }
+
+  return [
+    { title: `EOR Database - ${map.name}` },
+    { name: 'og:title', content: `EOR Database - ${map.name} (${x}, ${y})` },
+    {
+      name: 'og:url',
+      content: `https://endless-online.info/maps/${map.id}/find?x=${x}&y=${y}`,
+    },
+    {
+      name: 'og:description',
+      content: `Endless Online Map Finder ${map.name} (${x}, ${y})`,
+    },
+    {
+      name: 'description',
+      content: `Endless Online Map Finder ${map.name} (${x}, ${y})`,
+    },
+  ];
+}
+
 export async function loader({ request, params }: Route.LoaderArgs) {
   const id = Number.parseInt(params.id, 10);
   const url = new URL(request.url);

@@ -26,6 +26,10 @@ export function meta({ data }: Route.MetaArgs) {
       content: `https://endless-online.info/maps/${map.id}`,
     },
     {
+      name: 'og:image',
+      content: `https://endless-online.info/maps/${map.id}/preview`,
+    },
+    {
       name: 'og:description',
       content: `Information for ${map.name} Map in Endless Online`,
     },
