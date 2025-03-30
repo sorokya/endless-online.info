@@ -442,8 +442,8 @@ export async function getMapPreview(id: number): Promise<Buffer> {
     return buf;
   } catch (_err) {}
 
-  const width = (map.width + map.height) * (TILE_WIDTH / 2);
-  const height = (map.width + map.height) * (TILE_HEIGHT / 2);
+  const width = (map.width + 1 + map.height + 1) * (TILE_WIDTH / 2);
+  const height = (map.width + 1 + map.height + 1) * (TILE_HEIGHT / 2);
   const canvas = createCanvas(width, height);
 
   const ctx = canvas.getContext('2d');
@@ -485,15 +485,15 @@ export async function getMapPreview(id: number): Promise<Buffer> {
   };
 
   const offsetX = ((map.width - map.height) * (TILE_WIDTH / 2)) / 2;
-  for (let y = 0; y < map.height; ++y) {
-    for (let x = 0; x < map.width; ++x) {
+  for (let y = 0; y <= map.height; ++y) {
+    for (let x = 0; x <= map.width; ++x) {
       const tile = getTile(x, y);
-      if (tile > -1) {
-        ctx.fillStyle = getColor(tile);
-      } else if (npcSpawnAt(x, y)) {
+      if (npcSpawnAt(x, y)) {
         ctx.fillStyle = '#b34b5e';
       } else if (warpAt(x, y)) {
         ctx.fillStyle = '#4a5c9c';
+      } else if (tile > -1) {
+        ctx.fillStyle = getColor(tile);
       } else {
         ctx.fillStyle = '#333333';
       }
