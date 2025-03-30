@@ -69,6 +69,15 @@ const SpecTile = z.object({
   spec: z.number(),
 });
 
+const MapSign = z.object({
+  x: z.number(),
+  y: z.number(),
+  msg: z.object({
+    title: z.string(),
+    message: z.string(),
+  }),
+});
+
 const MapSchema = z.object({
   id: z.number(),
   rid1: z.number(),
@@ -96,6 +105,7 @@ const MapSchema = z.object({
   warp_tiles: z.array(WarpTile),
   map_layers: z.array(MapLayer),
   spec_tiles: z.array(SpecTile),
+  signs: z.array(MapSign),
 });
 
 const MapArraySchema = z.array(MapSchema);
@@ -336,4 +346,41 @@ export async function getMapChests(id: number): Promise<Chest[]> {
   }
 
   return chests;
+}
+
+type MapSign = {
+  x: number;
+  y: number;
+  title: string;
+  message: string;
+  graphic_id: number | undefined;
+};
+
+export async function getMapSigns(id: number): Promise<MapSign[]> {
+  const map = await getMapById(id);
+  if (!map) {
+    return [];
+  }
+
+  const getObjectGraphicAt = (x: number, y: number) => {
+    const objectLayer = map.map_layers.find((l) => l.details.name === 'Object');
+    if (!objectLayer?.tiles) {
+      return undefined;
+    }
+
+    const tile = objectLayer.tiles.find((t) => t.x === x && t.y === y);
+    if (!tile) {
+      return undefined;
+    }
+
+    return tile.tile;
+  };
+
+  return map.signs.map((sign) => ({
+    x: sign.x,
+    y: sign.y,
+    title: sign.msg.title,
+    message: sign.msg.message,
+    graphic_id: getObjectGraphicAt(sign.x, sign.y),
+  }));
 }

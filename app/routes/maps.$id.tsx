@@ -4,6 +4,7 @@ import {
   getMapChests,
   getMapGatherSpots,
   getMapNpcSpawns,
+  getMapSigns,
 } from '~/.server/maps';
 import { getLightMode } from '~/utils/get-light-mode';
 import { getNpcSpeed } from '~/utils/get-npc-speed';
@@ -40,17 +41,19 @@ export async function loader({ params }: Route.LoaderArgs) {
   const npcSpawns = await getMapNpcSpawns(id);
   const gatherSpots = await getMapGatherSpots(id);
   const chests = await getMapChests(id);
+  const signs = await getMapSigns(id);
 
   return data({
     map,
     npcSpawns,
     gatherSpots,
     chests,
+    signs,
   });
 }
 
 export default function MapPage({ loaderData }: Route.ComponentProps) {
-  const { map, npcSpawns, gatherSpots, chests } = loaderData;
+  const { map, npcSpawns, gatherSpots, chests, signs } = loaderData;
 
   if (!map) {
     return (
@@ -309,6 +312,40 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                         </div>
                       </div>
                     </details>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+
+          {signs.length > 0 && (
+            <details
+              className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl"
+              open
+            >
+              <summary className="collapse-title font-bold text-xl">
+                Signs:
+              </summary>
+
+              <div className="mt-1 grid grid-cols-2 gap-4 md:grid-cols-4">
+                {signs.map((sign) => (
+                  <div key={`${sign.x}${sign.y}`}>
+                    {sign.graphic_id && (
+                      <img
+                        src={`https://eor-api.exile-studios.com/api/graphics/6/${sign.graphic_id + 100}`}
+                        alt="Chest Graphic"
+                        className="h-16 w-full object-contain"
+                      />
+                    )}
+                    <div className="mt-2 text-center font-bold">
+                      {sign.title}
+                    </div>
+                    <div className="mt-2 text-center italic">
+                      {sign.message}
+                    </div>
+                    <div className="mt-2 text-center">
+                      Coords: {sign.x}, {sign.y}
+                    </div>
                   </div>
                 ))}
               </div>
