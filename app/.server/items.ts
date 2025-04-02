@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import { z } from 'zod';
 import { CONFIG } from '~/config';
+import { ItemSubType } from './item-sub-type';
+import { ItemType } from './item-type';
 import { MapTileSpec } from './map-tile-spec';
 import { getMaps } from './maps';
 import { getNpcById, getNpcByName, getNpcByQuestBehaviorId } from './npcs';
@@ -102,6 +104,7 @@ type Item = z.infer<typeof ItemSchema>;
 type ItemListEntry = {
   id: number;
   name: string;
+  meta: string[];
 };
 
 let ITEMS: Item[] | null = null;
@@ -132,19 +135,22 @@ export async function getItemList(search: {
   page: string;
 }): Promise<ItemListResult> {
   const items = await getItems();
-  const filtered = items
-    .filter((i) => {
-      return (
-        (!search.name ||
-          i.name.toLowerCase().indexOf(search.name.toLowerCase()) > -1) &&
-        (search.type === 'all' ||
-          i.item_type === Number.parseInt(search.type, 10))
-      );
-    })
-    .map((i) => ({
-      id: i.id,
-      name: i.name,
-    }));
+  const filtered = await Promise.all(
+    items
+      .filter((i) => {
+        return (
+          (!search.name ||
+            i.name.toLowerCase().indexOf(search.name.toLowerCase()) > -1) &&
+          (search.type === 'all' ||
+            i.item_type === Number.parseInt(search.type, 10))
+        );
+      })
+      .map(async (i) => ({
+        id: i.id,
+        name: i.name,
+        meta: await getItemMeta(i.id),
+      })),
+  );
 
   const page = Number.parseInt(search.page, 10);
   if (Number.isNaN(page)) {
@@ -158,6 +164,478 @@ export async function getItemList(search: {
     count: filtered.length,
     records: filtered.slice(start, end),
   };
+}
+
+export async function getItemMeta(id: number): Promise<string[]> {
+  const item = await getItemById(id);
+  if (!item) {
+    return [];
+  }
+
+  const meta = [];
+
+  const uniqueDiv20 = Math.floor(item.item_unique / 20);
+
+  let itemType: string;
+  if (item.item_type > 27) {
+    switch (item.item_type) {
+      case ItemType.General: {
+        let line = 'general';
+        switch (item.item_sub_type) {
+          case ItemSubType.Craft:
+            line += ' craft';
+            break;
+          case ItemSubType.Quest:
+            line += ' quest';
+            break;
+          case ItemSubType.Fillable:
+            line += ' fillable';
+            break;
+          case ItemSubType.Deprecated:
+            line += ' deprecated';
+        }
+        line += ' item';
+        itemType = line;
+        break;
+      }
+      case ItemType.Currency:
+        itemType = 'currency';
+        break;
+      case ItemType.Potion:
+        itemType = 'potion';
+        if (item.hp) {
+          itemType += ` + ${item.hp}hp`;
+        }
+        if (item.tp) {
+          itemType += ` + ${item.tp}mp`;
+        }
+        break;
+      case ItemType.Teleport:
+        itemType = 'teleport';
+        break;
+      case ItemType.Transformation:
+        itemType = 'transformation';
+        break;
+      case ItemType.ExpReward:
+        itemType = 'exp reward';
+        break;
+      case ItemType.SkillBook:
+        itemType = 'skill book';
+        break;
+      case ItemType.Reserved:
+        itemType = 'reserved';
+        break;
+      case ItemType.Key:
+        itemType = 'key';
+        break;
+      case ItemType.Title:
+        if (item.spec1 === 1) {
+          itemType = 'title';
+        } else {
+          itemType = 'announcement';
+        }
+        break;
+      case ItemType.Beverage:
+        itemType = 'beverage';
+        break;
+      case ItemType.Effect:
+        itemType = 'effect';
+        break;
+      case ItemType.Hairdye:
+        itemType = 'hairdye';
+        break;
+      case ItemType.Hairtool:
+        itemType = 'hairtool';
+        break;
+      case ItemType.Cure:
+        itemType = 'cure';
+        break;
+      case ItemType.VisualDocument:
+        itemType = 'visual document';
+        break;
+      case ItemType.AudioDocument:
+        itemType = 'audio document';
+        break;
+      case ItemType.TransportTicket:
+        itemType = 'transport ticket';
+        break;
+      case ItemType.Fireworks:
+        itemType = 'fireworks';
+        break;
+      case ItemType.Explosive:
+        itemType = 'explosive';
+        break;
+      case ItemType.ReviveOther:
+      case ItemType.ReviveSelf:
+        itemType = 'medical supply';
+        break;
+      case ItemType.Buff:
+        itemType = 'buff';
+        break;
+      case ItemType.Debuff:
+        itemType = 'debuff';
+        break;
+      default:
+        itemType = 'unknown';
+    }
+  } else {
+    switch (item.item_type) {
+      case ItemType.Currency:
+        itemType = 'currency';
+        break;
+      case ItemType.Potion:
+        itemType = 'potion';
+        if (item.hp) {
+          itemType += ` + ${item.hp}hp`;
+        }
+        if (item.tp) {
+          itemType += ` + ${item.tp}mp`;
+        }
+        break;
+      case ItemType.Teleport:
+        itemType = 'teleport';
+        break;
+      case ItemType.Transformation:
+        itemType = 'transformation';
+        break;
+      case ItemType.ExpReward:
+        itemType = 'exp reward';
+        break;
+      case ItemType.SkillBook:
+        itemType = 'skill book';
+        break;
+      case ItemType.Reserved:
+        itemType = 'reserved';
+        break;
+      case ItemType.Key:
+        itemType = 'key';
+        break;
+      default:
+        if (uniqueDiv20 === 5) {
+          itemType = 'cursed';
+        } else {
+          itemType = 'normal';
+        }
+
+        if (item.range) {
+          itemType += ' ranged';
+        }
+
+        if (
+          item.item_type === ItemType.Clothing ||
+          item.item_type === ItemType.Costume
+        ) {
+          if (item.spec2 === 1) {
+            itemType += ' male';
+          } else {
+            itemType += ' female';
+          }
+        }
+
+        switch (item.item_type) {
+          case ItemType.Weapon:
+            itemType += ' weapon';
+            break;
+          case ItemType.Shield:
+            itemType += ' shield';
+            break;
+          case ItemType.Clothing:
+            itemType += ' clothing';
+            break;
+          case ItemType.Hat:
+            itemType += ' hat';
+            break;
+          case ItemType.Boots:
+            itemType += ' boots';
+            break;
+          case ItemType.Gloves:
+            itemType += ' gloves';
+            break;
+          case ItemType.Accessory:
+            itemType += ' accessory';
+            break;
+          case ItemType.Belt:
+            itemType += ' belt';
+            break;
+          case ItemType.Necklace:
+            itemType += ' necklace';
+            break;
+          case ItemType.Ring:
+            itemType += ' ring';
+            break;
+          case ItemType.Bracelet:
+            itemType += ' bracelet';
+            break;
+          case ItemType.Bracer:
+            itemType += ' bracer';
+            break;
+          case ItemType.Costume:
+            itemType += ' costume';
+            break;
+          case ItemType.CostumeHat:
+            itemType += ' coshat';
+            break;
+          case ItemType.Wings:
+            itemType += ' wings';
+            break;
+          case ItemType.BuddyShoulder:
+          case ItemType.BuddyGround:
+            itemType += ' buddy';
+            break;
+          case ItemType.Torch:
+            itemType += ' torch';
+            break;
+        }
+    }
+  }
+
+  switch (uniqueDiv20) {
+    case 1:
+      itemType += ' (lore)';
+      break;
+    case 2:
+      itemType += ' (bound)';
+      break;
+    case 3:
+      itemType += ' (forever)';
+      break;
+    case 4:
+      itemType += ' (volatile)';
+      break;
+  }
+
+  if (uniqueDiv20 >= 6) {
+    itemType += ' (expiring)';
+  }
+
+  meta.push(itemType);
+
+  if (item.item_sub_type === ItemSubType.Wedding) {
+    meta.push('+wedding');
+  }
+
+  if (item.item_sub_type === ItemSubType.Warmth) {
+    meta.push('+warmth');
+  }
+
+  if (
+    (item.item_type === ItemType.Shield ||
+      item.item_type === ItemType.Weapon) &&
+    item.item_sub_type === ItemSubType.Playable
+  ) {
+    meta.push('+playable');
+  }
+
+  if (
+    item.item_type === ItemType.Weapon &&
+    item.item_sub_type === ItemSubType.Mining
+  ) {
+    meta.push('+minerable mining');
+  }
+
+  if (
+    item.item_type === ItemType.Weapon &&
+    item.item_sub_type === ItemSubType.Logging
+  ) {
+    meta.push('+wood logging');
+  }
+
+  if (
+    item.item_type === ItemType.Weapon &&
+    item.item_sub_type === ItemSubType.Farming
+  ) {
+    meta.push('+farming');
+  }
+
+  if (
+    item.item_type === ItemType.Weapon &&
+    item.item_sub_type === ItemSubType.Fishing
+  ) {
+    meta.push('+fishing');
+  }
+
+  if (
+    item.item_type === ItemType.Weapon &&
+    item.item_sub_type === ItemSubType.Antidote
+  ) {
+    meta.push('+antidote');
+  }
+
+  if (
+    item.item_type === ItemType.Weapon &&
+    item.item_sub_type === ItemSubType.Unboxing
+  ) {
+    meta.push('+unboxing');
+  }
+
+  if (item.item_sub_type === ItemSubType.StealTheShow) {
+    meta.push('.. steal the show');
+  }
+
+  if (item.item_type === ItemType.ReviveOther) {
+    meta.push('revive other');
+  }
+
+  if (item.item_type === ItemType.ReviveSelf) {
+    meta.push('revive self');
+  }
+
+  if (item.item_type >= 10 && item.item_type <= 27) {
+    if (item.min_damage || item.max_damage) {
+      let damage: string;
+      if (item.aoe_flag) {
+        damage = 'aoe: ';
+      } else {
+        damage = 'damage: ';
+      }
+
+      damage += `${item.min_damage} - ${item.max_damage}`;
+
+      if (item.range) {
+        damage += ` +${item.range}r`;
+      }
+
+      meta.push(damage);
+    }
+
+    if (item.hp || item.tp || item.sp) {
+      let add = 'add+';
+      if (item.hp) {
+        add += ` ${item.hp}hp`;
+      }
+
+      if (item.tp) {
+        add += ` ${item.tp}mp`;
+      }
+
+      if (item.sp) {
+        add += ` ${item.sp}sp`;
+      }
+      meta.push(add);
+    }
+
+    if (item.defense || item.evasion || item.armor) {
+      let def = 'def+';
+      if (item.defense) {
+        def += ` ${item.defense}def`;
+      }
+
+      if (item.evasion) {
+        def += ` ${item.evasion}eva`;
+      }
+
+      if (item.armor) {
+        def += ` ${item.armor}arm`;
+      }
+      meta.push(def);
+    }
+
+    if (item.critical_chance && item.hit_rate) {
+      let plus = 'plus+';
+      if (item.hit_rate) {
+        plus += ` ${item.hit_rate}hit`;
+      }
+
+      if (item.critical_chance) {
+        plus += ` ${item.critical_chance}crit`;
+      }
+
+      meta.push(plus);
+    } else if (item.critical_chance) {
+      meta.push(`crit+ ${item.critical_chance}`);
+    }
+
+    if (
+      item.power ||
+      item.accuracy ||
+      item.dexterity ||
+      item.defense ||
+      item.vitality ||
+      item.aura
+    ) {
+      let stat = 'stat+';
+
+      if (item.power) {
+        stat += ` ${item.power}pow`;
+      }
+
+      if (item.accuracy) {
+        stat += ` ${item.accuracy}acc`;
+      }
+
+      if (item.dexterity) {
+        stat += ` ${item.dexterity}dex`;
+      }
+
+      if (item.defense) {
+        stat += ` ${item.defense}def`;
+      }
+
+      if (item.vitality) {
+        stat += ` ${item.vitality}vit`;
+      }
+
+      if (item.aura) {
+        stat += ` ${item.aura}aur`;
+      }
+
+      meta.push(stat);
+    }
+  }
+
+  if (
+    item.required_level ||
+    item.required_class ||
+    item.required_power ||
+    item.required_accuracy ||
+    item.required_dexterity ||
+    item.required_defense ||
+    item.required_vitality ||
+    item.required_aura
+  ) {
+    let req = 'req:';
+
+    if (item.required_level) {
+      req += ` ${item.required_level}LVL`;
+    }
+
+    if (item.required_class) {
+      // TODO: Load class name
+      req += ` Class ${item.required_class}`;
+    }
+
+    if (item.required_power) {
+      req += ` ${item.power}pow`;
+    }
+
+    if (item.required_accuracy) {
+      req += ` ${item.accuracy}acc`;
+    }
+
+    if (item.required_dexterity) {
+      req += ` ${item.dexterity}dex`;
+    }
+
+    if (item.required_defense) {
+      req += ` ${item.defense}def`;
+    }
+
+    if (item.required_vitality) {
+      req += ` ${item.vitality}vit`;
+    }
+
+    if (item.required_aura) {
+      req += ` ${item.aura}aur`;
+    }
+
+    meta.push(req);
+  }
+
+  if (item.sell_price) {
+    meta.push(`sell: ${item.sell_price}`);
+  }
+
+  return meta;
 }
 
 export async function getItemById(id: number): Promise<Item | undefined> {
@@ -211,9 +689,14 @@ export async function getItemDrops(id: number): Promise<ItemDrop[]> {
   return drops.concat(sharedDrops).filter((drop) => !!drop);
 }
 
+type ItemIngredientFor = {
+  id: number;
+  name: string;
+};
+
 export async function getItemIngredientFor(
   id: number,
-): Promise<ItemListEntry[]> {
+): Promise<ItemIngredientFor[]> {
   const item = await getItemById(id);
   if (!item || !item.ingredientFor) {
     return [];

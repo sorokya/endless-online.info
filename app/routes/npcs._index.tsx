@@ -199,6 +199,11 @@ export default function Npcs({ loaderData }: Route.ComponentProps) {
                   className="h-16 w-full object-contain"
                 />
                 <div className="mt-2 text-center font-bold">{npc.name}</div>
+                <div className="flex flex-col items-center text-xs opacity-75">
+                  {npc.meta.map((meta) => (
+                    <div key={meta}>{meta}</div>
+                  ))}
+                </div>
               </Link>
             ))}
           </div>

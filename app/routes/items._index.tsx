@@ -227,6 +227,11 @@ export default function Items({ loaderData }: Route.ComponentProps) {
                   className="transform-[scale(2)] mx-auto mt-4"
                 />
                 <div className="mt-2 text-center font-bold">{item.name}</div>
+                <div className="flex flex-col items-center text-xs opacity-75">
+                  {item.meta.map((meta) => (
+                    <div key={meta}>{meta}</div>
+                  ))}
+                </div>
               </Link>
             ))}
           </div>

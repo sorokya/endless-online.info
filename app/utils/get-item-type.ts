@@ -1,8 +1,6 @@
 export function getItemType(id: number): string {
   switch (id) {
     case 0:
-      return 'Static';
-    case 1:
       return 'General';
     case 2:
       return 'Money';

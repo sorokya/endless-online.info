@@ -1,5 +1,4 @@
 import { Link, data } from 'react-router';
-import { getClassById } from '~/.server/classes';
 import {
   getItemById,
   getItemChestSpawns,
@@ -7,6 +6,7 @@ import {
   getItemDrops,
   getItemGatherSpots,
   getItemIngredientFor,
+  getItemMeta,
   getItemRewards,
   getItemSoldBy,
 } from '~/.server/items';
@@ -42,13 +42,11 @@ export function meta({ data }: Route.MetaArgs) {
 export async function loader({ params }: Route.LoaderArgs) {
   const id = Number.parseInt(params.id, 10);
   const item = await getItemById(id);
+  const meta = await getItemMeta(id);
   const drops = await getItemDrops(id);
   const ingredientFor = await getItemIngredientFor(id);
   const craftables = await getItemCraftables(id);
   const soldBy = await getItemSoldBy(id);
-  const requiredClass = item?.required_class
-    ? await getClassById(item.required_class)
-    : null;
   const rewards = await getItemRewards(id);
   const gatherSpots = await getItemGatherSpots(id);
   const chestSpawns = await getItemChestSpawns(id);
@@ -58,7 +56,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     drops,
     ingredientFor,
     craftables,
-    requiredClassName: requiredClass?.name || 'None',
+    meta,
     rewards,
     gatherSpots,
     chestSpawns,
@@ -72,7 +70,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
     drops,
     ingredientFor,
     craftables,
-    requiredClassName,
+    meta,
     rewards,
     gatherSpots,
     chestSpawns,
@@ -103,7 +101,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
             {getItemType(item.item_type)}
           </span>
 
-          <div className="mb-4 flex justify-center">
+          <div className="flex justify-center">
             <img
               src={item.graphic_url}
               alt={item.name}
@@ -111,50 +109,11 @@ export default function Item({ loaderData }: Route.ComponentProps) {
             />
           </div>
 
-          <details className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl">
-            <summary className="collapse-title font-bold text-xl">
-              Stats:
-            </summary>
-
-            <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
-              <div className="font-bold">HP</div>
-              <div>{item.hp}</div>
-              <div className="font-bold">MP</div>
-              <div>{item.tp}</div>
-              <div className="hidden md:block" />
-              <div className="hidden md:block" />
-
-              <div className="font-bold">Power</div>
-              <div>{item.power}</div>
-              <div className="font-bold">Accuracy</div>
-              <div>{item.accuracy}</div>
-              <div className="font-bold">Dexterity</div>
-              <div>{item.dexterity}</div>
-
-              <div className="font-bold">Defense</div>
-              <div>{item.defense}</div>
-              <div className="font-bold">Vitality</div>
-              <div>{item.vitality}</div>
-              <div className="font-bold">Aura</div>
-              <div>{item.aura}</div>
-
-              <div className="font-bold">Hit Rate</div>
-              <div>{item.hit_rate}</div>
-              <div className="font-bold">Evade</div>
-              <div>{item.evasion}</div>
-              <div className="font-bold">Armor</div>
-              <div>{item.armor}</div>
-
-              <div className="font-bold">Damage</div>
-              <div>
-                {item.min_damage} - {item.max_damage}
-              </div>
-              <div className="font-bold">Range</div>
-              <div>{item.range}</div>
-              <div className="font-bold">Critical Chance</div>
-              <div>{item.critical_chance}</div>
-            </div>
-          </details>
+          <div className="mb-4 flex flex-col items-center text-xs opacity-75">
+            {meta.map((meta) => (
+              <div key={meta}>{meta}</div>
+            ))}
+          </div>
 
           {drops.length > 0 && (
             <details
@@ -220,6 +179,14 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                         {capitalize(sell.map_name)}
                       </Link>
                     </div>
+                    <div className="mt-2 text-center">
+                      <Link
+                        to={`/maps/${sell.map_id}/find?x=${sell.x}&y=${sell.y}`}
+                        className="link-info"
+                      >
+                        {sell.x}, {sell.y}
+                      </Link>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -265,6 +232,14 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                             <div className="mt-2 text-center">
                               <Link to={`/maps/${n.map_id}`}>
                                 {capitalize(n.map_name)}
+                              </Link>
+                            </div>
+                            <div className="mt-2 text-center">
+                              <Link
+                                to={`/maps/${n.map_id}/find?x=${n.x}&y=${n.y}`}
+                                className="link-info"
+                              >
+                                {n.x}, {n.y}
                               </Link>
                             </div>
                           </div>
@@ -347,6 +322,14 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                             <div className="text-xs">
                               <Link to={`/maps/${n.map_id}`}>
                                 {capitalize(n.map_name)}
+                              </Link>
+                            </div>
+                            <div className="text-xs">
+                              <Link
+                                to={`/maps/${n.map_id}/find?x=${n.x}&y=${n.y}`}
+                                className="link-info"
+                              >
+                                {n.x}, {n.y}
                               </Link>
                             </div>
                           </div>
@@ -487,7 +470,6 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       {spot.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords:{' '}
                       <Link
                         to={`/maps/${spot.map_id}/find?x=${spot.x}&y=${spot.y}`}
                         className="link-info"
@@ -531,7 +513,6 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                       {spawn.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords:{' '}
                       <Link
                         to={`/maps/${spawn.map_id}/find?x=${spawn.x}&y=${spawn.y}`}
                         className="link-info"
@@ -550,35 +531,6 @@ export default function Item({ loaderData }: Route.ComponentProps) {
               </div>
             </details>
           )}
-
-          <details className="collapse-arrow collapse rounded-xl bg-base-100 p-4 shadow-xl">
-            <summary className="collapse-title font-bold text-xl">
-              Requirements:
-            </summary>
-
-            <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
-              <div className="font-bold">Level</div>
-              <div>{item.required_level}</div>
-              <div className="font-bold">Class</div>
-              <div>{requiredClassName}</div>
-              <div className="hidden md:block" />
-              <div className="hidden md:block" />
-
-              <div className="font-bold">Power</div>
-              <div>{item.required_power}</div>
-              <div className="font-bold">Accuracy</div>
-              <div>{item.required_accuracy}</div>
-              <div className="font-bold">Dexterity</div>
-              <div>{item.required_dexterity}</div>
-
-              <div className="font-bold">Defense</div>
-              <div>{item.required_defense}</div>
-              <div className="font-bold">Vitality</div>
-              <div>{item.required_vitality}</div>
-              <div className="font-bold">Aura</div>
-              <div>{item.required_aura}</div>
-            </div>
-          </details>
         </div>
       </div>
     </div>

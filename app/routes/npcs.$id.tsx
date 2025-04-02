@@ -4,10 +4,10 @@ import {
   getNpcById,
   getNpcCrafts,
   getNpcDrops,
+  getNpcMeta,
   getNpcSpawns,
 } from '~/.server/npcs';
 import { getNpcSpeed } from '~/utils/get-npc-speed';
-import { getNpcType } from '~/utils/get-npc-type';
 import type { Route } from './+types/npcs.$id';
 
 export function meta({ data }: Route.MetaArgs) {
@@ -38,6 +38,7 @@ export function meta({ data }: Route.MetaArgs) {
 export async function loader({ params }: Route.LoaderArgs) {
   const id = Number.parseInt(params.id, 10);
   const npc = await getNpcById(id);
+  const meta = getNpcMeta(npc);
   const drops = await getNpcDrops(id);
   const spawns = await getNpcSpawns(id);
   const buyItems = await getNpcBuyItems(id);
@@ -45,6 +46,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
   return data({
     npc,
+    meta,
     drops,
     spawns,
     buyItems,
@@ -53,7 +55,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 }
 
 export default function Npc({ loaderData }: Route.ComponentProps) {
-  const { npc, drops, spawns, buyItems, crafts } = loaderData;
+  const { npc, meta, drops, spawns, buyItems, crafts } = loaderData;
 
   if (!npc) {
     return (
@@ -75,16 +77,19 @@ export default function Npc({ loaderData }: Route.ComponentProps) {
       <div className="card bg-base-200 p-4 shadow-xl">
         <div className="card-body">
           <h2 className="mb-4 text-center font-bold text-2xl">{npc.name}</h2>
-          <span className="mb-4 text-center text-md italic">
-            {getNpcType(npc.behavior)}
-          </span>
 
-          <div className="mb-4 flex justify-center">
+          <div className="flex justify-center">
             <img
               src={`https://eor-api.exile-studios.com/api/npcs/${npc.id}/graphic`}
               alt={npc.name}
               className="h-16 w-auto object-contain"
             />
+          </div>
+
+          <div className="mb-4 flex flex-col items-center text-xs opacity-75">
+            {meta.map((meta) => (
+              <div key={meta}>{meta}</div>
+            ))}
           </div>
 
           <details
@@ -344,7 +349,6 @@ export default function Npc({ loaderData }: Route.ComponentProps) {
                       {spawn.map_name}
                     </div>
                     <div className="mt-2 text-center">
-                      Coords:{' '}
                       <Link
                         to={`/maps/${spawn.map_id}/find?x=${spawn.x}&y=${spawn.y}`}
                         className="link-info"

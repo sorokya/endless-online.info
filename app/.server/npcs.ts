@@ -64,6 +64,7 @@ export type Npc = z.infer<typeof NpcSchema>;
 type NpcListEntry = {
   id: number;
   name: string;
+  meta: string[];
 };
 
 let NPCS: Npc[] | null = null;
@@ -104,6 +105,7 @@ export async function getNpcList(search: {
     .map((i) => ({
       id: i.id,
       name: i.name,
+      meta: getNpcMeta(i),
     }));
 
   const page = Number.parseInt(search.page, 10);
@@ -118,6 +120,104 @@ export async function getNpcList(search: {
     count: filtered.length,
     records: filtered.slice(start, end),
   };
+}
+
+export function getNpcMeta(npc: Npc | undefined): string[] {
+  if (!npc) {
+    return [];
+  }
+
+  const meta = [];
+
+  switch (npc.behavior) {
+    case 0:
+      meta.push('friendly');
+      break;
+    case 1:
+      meta.push('passive');
+      break;
+    case 2:
+      meta.push('aggressive');
+      break;
+    case 5:
+      meta.push('crafting');
+      break;
+    case 6:
+      meta.push('shop');
+      break;
+    case 7:
+      meta.push('inn keeper');
+      break;
+    case 9:
+      meta.push('banker');
+      break;
+    case 10:
+      meta.push('barber');
+      break;
+    case 11:
+      meta.push('guild master');
+      break;
+    case 12:
+      meta.push('priest');
+      break;
+    case 13:
+      meta.push('lawyer');
+      break;
+    case 14:
+      meta.push('trainer');
+      break;
+    case 15:
+      meta.push('quest');
+      break;
+    default:
+      meta.push('unknown');
+  }
+
+  if (npc.behavior === 1 || npc.behavior === 2) {
+    if (npc.hp || npc.tp || npc.level) {
+      let stat = 'stat:';
+      if (npc.hp) {
+        stat += ` ${npc.hp}hp`;
+      }
+
+      if (npc.tp) {
+        stat += ` ${npc.tp}mp`;
+      }
+
+      if (npc.level) {
+        stat += ` ${npc.level}LVL`;
+      }
+
+      meta.push(stat);
+    }
+
+    if (npc.min_damage || npc.max_damage) {
+      meta.push(`damage: ${npc.min_damage} - ${npc.max_damage}`);
+    }
+
+    if (npc.accuracy || npc.evasion || npc.armor) {
+      let def = 'def+';
+      if (npc.accuracy) {
+        def += ` ${npc.accuracy}acc`;
+      }
+
+      if (npc.evasion) {
+        def += ` ${npc.evasion}eva`;
+      }
+
+      if (npc.armor) {
+        def += ` ${npc.armor}arm`;
+      }
+
+      meta.push(def);
+    }
+
+    if (npc.experience) {
+      meta.push(`exp: ${npc.experience}`);
+    }
+  }
+
+  return meta;
 }
 
 export async function getNpcById(id: number): Promise<Npc | undefined> {
