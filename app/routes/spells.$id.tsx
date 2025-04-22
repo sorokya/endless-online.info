@@ -1,8 +1,6 @@
 import { data } from 'react-router';
 import { getSpellById } from '~/.server/spells';
-import { getSpellTarget } from '~/utils/get-spell-target';
-import { getSpellTargetRestrict } from '~/utils/get-spell-target-restrict';
-import { getSpellType } from '~/utils/get-spell-type';
+import { getSpellDirectEffect } from '~/utils/get-spell-direct-effect';
 import type { Route } from './+types/spells.$id';
 
 export function meta({ data }: Route.MetaArgs) {
@@ -63,17 +61,6 @@ export default function Spell({ loaderData }: Route.ComponentProps) {
         <div className="card-body">
           <h2 className="mb-4 text-center font-bold text-2xl">{spell.name}</h2>
 
-          <div className="spell-icon">
-            <div
-              style={{
-                width: 34,
-                height: 32,
-                margin: 'auto',
-                backgroundImage: `url(https://eor-api.exile-studios.com/api/spells/${spell.id}/icon)`,
-              }}
-            />
-          </div>
-
           <div className="text-center">
             <em>"{spell.shout}"</em>
           </div>
@@ -87,12 +74,8 @@ export default function Spell({ loaderData }: Route.ComponentProps) {
             </summary>
 
             <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
-              <div className="font-bold">Type</div>
-              <div>{getSpellType(spell.spell_type)}</div>
-              <div className="font-bold">Target</div>
-              <div>{getSpellTarget(spell.target_type)}</div>
-              <div className="font-bold">Target Restrict</div>
-              <div>{getSpellTargetRestrict(spell.target_restrict)}</div>
+              <div className="font-bold">Direct Effect</div>
+              <div>{getSpellDirectEffect(spell.direct_effect)}</div>
 
               <div className="font-bold">MP Cost</div>
               <div>{spell.tp_cost}</div>
@@ -101,21 +84,24 @@ export default function Spell({ loaderData }: Route.ComponentProps) {
               <div className="font-bold">Cast time</div>
               <div>{spell.cast_time}s</div>
 
-              {spell.spell_type === 0 && (
+              <div className="font-bold">Cooldown</div>
+              <div>{spell.cooldown}s</div>
+
+              {spell.direct_effect === 2 && (
                 <>
                   <div className="font-bold">HP</div>
-                  <div>{spell.hp}</div>
+                  <div>
+                    {spell['direct-low']} - {spell['direct-high']}
+                  </div>
                 </>
               )}
 
-              {spell.spell_type === 1 && (
+              {spell.direct_effect === 1 && (
                 <>
                   <div className="font-bold">Damage</div>
                   <div>
-                    {spell.min_damage} - {spell.max_damage}
+                    {spell['direct-low']} - {spell['direct-high']}
                   </div>
-                  <div className="font-bold">Accuracy</div>
-                  <div>{spell.accuracy}</div>
                 </>
               )}
             </div>

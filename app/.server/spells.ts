@@ -10,16 +10,14 @@ const SpellSchema = z.object({
   graphic: z.number(),
   tp_cost: z.number(),
   sp_cost: z.number(),
+  range: z.number(),
+  cooldown: z.number(),
   cast_time: z.number(),
-  spell_type: z.number(),
-  element: z.number(),
-  element_power: z.number(),
-  target_restrict: z.number(),
-  target_type: z.number(),
-  min_damage: z.number(),
-  max_damage: z.number(),
-  accuracy: z.number(),
-  hp: z.number(),
+  direct_effect: z.number(),
+  direct_ch: z.number(),
+  'direct-low': z.number(),
+  'direct-high': z.number(),
+  after_effect: z.number(),
 });
 
 const SpellArraySchema = z.array(SpellSchema);

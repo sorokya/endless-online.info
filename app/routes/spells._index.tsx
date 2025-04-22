@@ -158,14 +158,6 @@ export default function Classes({ loaderData }: Route.ComponentProps) {
                 key={s.id}
                 className="card spell-icon bg-base-200 p-4 shadow-xl"
               >
-                <div
-                  style={{
-                    width: 34,
-                    height: 32,
-                    margin: 'auto',
-                    backgroundImage: `url(https://eor-api.exile-studios.com/api/spells/${s.id}/icon)`,
-                  }}
-                />
                 <div className="mt-2 text-center font-bold">{s.name}</div>
               </Link>
             ))}

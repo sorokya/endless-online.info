@@ -70,18 +70,18 @@ export default function Class({ loaderData }: Route.ComponentProps) {
 
             <div className="grid grid-cols-2 gap-4 rounded-lg bg-base-100 p-4 shadow md:grid-cols-6">
               <div className="font-bold">Power</div>
-              <div>{cls.power}</div>
+              <div>{cls.base_power}</div>
               <div className="font-bold">Accuracy</div>
-              <div>{cls.accuracy}</div>
+              <div>{cls.base_accuracy}</div>
               <div className="font-bold">Dexterity</div>
-              <div>{cls.dexterity}</div>
+              <div>{cls.base_dexterity}</div>
 
               <div className="font-bold">Defense</div>
-              <div>{cls.defense}</div>
+              <div>{cls.base_defense}</div>
               <div className="font-bold">Vitality</div>
-              <div>{cls.vitality}</div>
+              <div>{cls.base_vitality}</div>
               <div className="font-bold">Aura</div>
-              <div>{cls.aura}</div>
+              <div>{cls.base_aura}</div>
             </div>
           </details>
         </div>
