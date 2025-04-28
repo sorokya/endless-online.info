@@ -27,8 +27,8 @@ importers:
         specifier: ^16.4.7
         version: 16.4.7
       isbot:
-        specifier: ^5.1.17
-        version: 5.1.25
+        specifier: ^5.1.27
+        version: 5.1.27
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -1628,8 +1628,8 @@ packages:
   isarray@1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
 
-  isbot@5.1.25:
-    resolution: {integrity: sha512-mqU76fmT7cpGG0JX1EzhCZIC+xovpH6TD2SAK18alonk0RG/RgChpGduJTYzRaq9a0COoFA99M9JVtEUOcScIw==}
+  isbot@5.1.27:
+    resolution: {integrity: sha512-V3W56Hnztt4Wdh3VUlAMbdNicX/tOM38eChW3a2ixP6KEBJAeehxzYzTD59JrU5NCTgBZwRt9lRWr8D7eMZVYQ==}
     engines: {node: '>=18'}
 
   isexe@2.0.0:
@@ -3982,7 +3982,7 @@ snapshots:
 
   isarray@1.0.0: {}
 
-  isbot@5.1.25: {}
+  isbot@5.1.27: {}
 
   isexe@2.0.0: {}
 
