@@ -10,7 +10,6 @@ const SpellSchema = z.object({
   graphic: z.number(),
   tp_cost: z.number(),
   sp_cost: z.number(),
-  range: z.number(),
   cooldown: z.number(),
   cast_time: z.number(),
   direct_effect: z.number(),

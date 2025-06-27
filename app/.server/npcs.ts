@@ -39,7 +39,6 @@ const NpcSchema = z.object({
   move_conveyor: z.number(),
   idle_aura: z.number(),
   role: z.number(),
-  range: z.number(),
   hp: z.number(),
   tp: z.number(),
   min_damage: z.number(),

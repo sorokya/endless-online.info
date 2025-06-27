@@ -46,7 +46,7 @@ const ItemSchema = z.object({
   name: z.string(),
   graphic: z.number(),
   item_type: z.number(),
-  item_sub_type: z.number(),
+  pierce: z.number(),
   item_unique: z.number(),
   hp: z.number(),
   tp: z.number(),
@@ -81,7 +81,7 @@ const ItemSchema = z.object({
   required_vitality: z.number(),
   required_aura: z.number(),
   weight: z.number(),
-  range: z.number(),
+  target_area: z.number().optional(),
   aoe_flag: z.number(),
   size: z.number(),
   sell_price: z.number(),
@@ -181,7 +181,7 @@ export async function getItemMeta(id: number): Promise<string[]> {
     switch (item.item_type) {
       case ItemType.General: {
         let line = 'general';
-        switch (item.item_sub_type) {
+        switch (item.pierce) {
           case ItemSubType.Craft:
             line += ' craft';
             break;
@@ -317,8 +317,8 @@ export async function getItemMeta(id: number): Promise<string[]> {
           itemType = 'normal';
         }
 
-        if (item.range) {
-          itemType += ' ranged';
+        if (item.target_area) {
+          itemType += ' target_aread';
         }
 
         if (
@@ -410,65 +410,65 @@ export async function getItemMeta(id: number): Promise<string[]> {
 
   meta.push(itemType);
 
-  if (item.item_sub_type === ItemSubType.Wedding) {
+  if (item.pierce === ItemSubType.Wedding) {
     meta.push('+wedding');
   }
 
-  if (item.item_sub_type === ItemSubType.Warmth) {
+  if (item.pierce === ItemSubType.Warmth) {
     meta.push('+warmth');
   }
 
   if (
     (item.item_type === ItemType.Shield ||
       item.item_type === ItemType.Weapon) &&
-    item.item_sub_type === ItemSubType.Playable
+    item.pierce === ItemSubType.Playable
   ) {
     meta.push('+playable');
   }
 
   if (
     item.item_type === ItemType.Weapon &&
-    item.item_sub_type === ItemSubType.Mining
+    item.pierce === ItemSubType.Mining
   ) {
     meta.push('+minerable mining');
   }
 
   if (
     item.item_type === ItemType.Weapon &&
-    item.item_sub_type === ItemSubType.Logging
+    item.pierce === ItemSubType.Logging
   ) {
     meta.push('+wood logging');
   }
 
   if (
     item.item_type === ItemType.Weapon &&
-    item.item_sub_type === ItemSubType.Farming
+    item.pierce === ItemSubType.Farming
   ) {
     meta.push('+farming');
   }
 
   if (
     item.item_type === ItemType.Weapon &&
-    item.item_sub_type === ItemSubType.Fishing
+    item.pierce === ItemSubType.Fishing
   ) {
     meta.push('+fishing');
   }
 
   if (
     item.item_type === ItemType.Weapon &&
-    item.item_sub_type === ItemSubType.Antidote
+    item.pierce === ItemSubType.Antidote
   ) {
     meta.push('+antidote');
   }
 
   if (
     item.item_type === ItemType.Weapon &&
-    item.item_sub_type === ItemSubType.Unboxing
+    item.pierce === ItemSubType.Unboxing
   ) {
     meta.push('+unboxing');
   }
 
-  if (item.item_sub_type === ItemSubType.StealTheShow) {
+  if (item.pierce === ItemSubType.StealTheShow) {
     meta.push('.. steal the show');
   }
 
@@ -491,8 +491,8 @@ export async function getItemMeta(id: number): Promise<string[]> {
 
       damage += `${item.min_damage} - ${item.max_damage}`;
 
-      if (item.range) {
-        damage += ` +${item.range}r`;
+      if (item.target_area) {
+        damage += ` +${item.target_area}r`;
       }
 
       meta.push(damage);
