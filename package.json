@@ -14,7 +14,7 @@
     "@react-router/node": "^7.4.0",
     "@react-router/serve": "^7.4.0",
     "@uidotdev/usehooks": "^2.4.1",
-    "canvas": "^3.1.0",
+    "canvas": "^3.1.2",
     "dotenv": "^16.4.7",
     "isbot": "^5.1.28",
     "react": "^19.0.0",
