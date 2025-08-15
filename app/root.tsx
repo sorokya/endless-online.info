@@ -1,4 +1,5 @@
 import {
+  isRouteErrorResponse,
   Link,
   Links,
   Meta,
@@ -6,7 +7,6 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  isRouteErrorResponse,
 } from 'react-router';
 
 import Logo from '~/icon.svg';

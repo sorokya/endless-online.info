@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Route } from './+types/npcs._index';
-
 import { useDebounce } from '@uidotdev/usehooks';
-import { Form, Link, data } from 'react-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { data, Form, Link } from 'react-router';
 import { getNpcList } from '~/.server/npcs';
 import { CONFIG } from '~/config';
+import type { Route } from './+types/npcs._index';
 
 export function links() {
   return [{ rel: 'canonical', href: 'https://endless-online.info/npcs' }];

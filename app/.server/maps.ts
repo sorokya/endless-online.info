@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { Image, createCanvas } from 'canvas';
+import { createCanvas, Image } from 'canvas';
 import { z } from 'zod';
 import { CONFIG } from '~/config';
 import { getItemById } from './items';

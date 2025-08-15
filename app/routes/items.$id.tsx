@@ -1,4 +1,4 @@
-import { Link, data } from 'react-router';
+import { data, Link } from 'react-router';
 import {
   getItemById,
   getItemChestSpawns,
