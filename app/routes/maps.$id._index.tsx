@@ -190,7 +190,7 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <img
-                      src={`https://eor-api.exile-studios.com/api/graphics/6/${spot.graphic_id}`}
+                      src={`https://eor-api.exile-studios.com/api/graphics/7/${spot.graphic_id}`}
                       alt={spot.item_name}
                       className="h-16 w-full object-contain"
                     />
@@ -237,7 +237,7 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                         <div className="card bg-base-200 p-4 shadow-xl">
                           {c.graphic_id && (
                             <img
-                              src={`https://eor-api.exile-studios.com/api/graphics/6/${c.graphic_id + 100}`}
+                              src={`https://eor-api.exile-studios.com/api/graphics/7/${c.graphic_id + 100}`}
                               alt="Chest Graphic"
                               className="h-16 w-full object-contain"
                             />
@@ -304,7 +304,7 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                       <div className="collapse-content flex flex-wrap justify-center gap-2">
                         {c.graphic_id && (
                           <img
-                            src={`https://eor-api.exile-studios.com/api/graphics/6/${c.graphic_id + 100}`}
+                            src={`https://eor-api.exile-studios.com/api/graphics/7/${c.graphic_id + 100}`}
                             alt="Chest Graphic"
                             className="h-16 w-full object-contain"
                           />
@@ -409,7 +409,7 @@ export default function MapPage({ loaderData }: Route.ComponentProps) {
                   <div key={`${sign.x}${sign.y}`}>
                     {sign.graphic_id && (
                       <img
-                        src={`https://eor-api.exile-studios.com/api/graphics/6/${sign.graphic_id + 100}`}
+                        src={`https://eor-api.exile-studios.com/api/graphics/7/${sign.graphic_id + 100}`}
                         alt="Chest Graphic"
                         className="h-16 w-full object-contain"
                       />

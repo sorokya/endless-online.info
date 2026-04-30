@@ -462,7 +462,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                     className="card bg-base-200 p-4 shadow-xl"
                   >
                     <img
-                      src={`https://eor-api.exile-studios.com/api/graphics/6/${spot.graphic_id}`}
+                      src={`https://eor-api.exile-studios.com/api/graphics/7/${spot.graphic_id}`}
                       alt={item.name}
                       className="h-16 w-full object-contain"
                     />
@@ -504,7 +504,7 @@ export default function Item({ loaderData }: Route.ComponentProps) {
                   >
                     {spawn.graphic_id && (
                       <img
-                        src={`https://eor-api.exile-studios.com/api/graphics/6/${spawn.graphic_id + 100}`}
+                        src={`https://eor-api.exile-studios.com/api/graphics/7/${spawn.graphic_id + 100}`}
                         alt={item.name}
                         className="h-8 w-full object-contain"
                       />

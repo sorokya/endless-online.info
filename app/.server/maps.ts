@@ -73,10 +73,8 @@ const SpecTile = z.object({
 const MapSign = z.object({
   x: z.number(),
   y: z.number(),
-  msg: z.object({
-    title: z.string(),
-    message: z.string(),
-  }),
+  title: z.string(),
+  message: z.string(),
 });
 
 const MapSchema = z.object({
@@ -380,8 +378,8 @@ export async function getMapSigns(id: number): Promise<MapSign[]> {
   return map.signs.map((sign) => ({
     x: sign.x,
     y: sign.y,
-    title: sign.msg.title,
-    message: sign.msg.message,
+    title: sign.title,
+    message: sign.message,
     graphic_id: getObjectGraphicAt(sign.x, sign.y),
   }));
 }
