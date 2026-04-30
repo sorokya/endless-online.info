@@ -20,6 +20,7 @@ export function meta({ data }: Route.MetaArgs) {
     return [];
   }
 
+
   return [
     { title: `EOR Database - ${item.name}` },
     { name: 'og:title', content: `EOR Database - ${item.name}` },
