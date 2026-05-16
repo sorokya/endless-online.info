@@ -5,7 +5,7 @@ RUN apk add build-base g++ cairo-dev pango-dev giflib-dev py-setuptools
 
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN npm install -g pnpm
 RUN pnpm install --frozen-lockfile
 
@@ -18,7 +18,7 @@ WORKDIR /app
 
 RUN apk add build-base g++ cairo-dev pango-dev giflib-dev py-setuptools
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN npm install -g pnpm
 RUN pnpm install --prod --frozen-lockfile
 
