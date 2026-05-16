@@ -1,0 +1,6 @@
+# pnpm-workspace.yaml - approved build dependencies
+# Auto-managed by lagann-bot maintenance
+allowBuilds:
+  '@tailwindcss/oxide': true
+  canvas: true
+  esbuild: true
