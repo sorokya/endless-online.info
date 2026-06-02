@@ -30,7 +30,7 @@
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
     "daisyui": "^5.5.20",
-    "react-router-devtools": "^6.2.0",
+    "react-router-devtools": "^6.2.1",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
